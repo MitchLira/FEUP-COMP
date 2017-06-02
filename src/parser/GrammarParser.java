@@ -2,6 +2,10 @@
 package parser;
 
 import logic.NFASet;
+import fa.NFA;
+import gui.GraphViz;
+import java.io.File;
+import fa.DFA;
 
 public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants, GrammarParserConstants {/*@bgen(jjtree)*/
   protected JJTGrammarParserState jjtree = new JJTGrammarParserState();public static void main(String args[]) throws ParseException {
@@ -9,8 +13,33 @@ public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants
     SimpleNode root = gp.Start();
 
     NFASet parser = new NFASet((SimpleNode) root.jjtGetChild(0), null);
+    NFA nfa = parser.convert();
+    nfa.getLastState().setAcceptState(true);
+    System.out.println(nfa.toString());
+    DFA dfa= nfa.getDFA();
+
+    System.out.println(nfa.toDotFormat());
+    createDotGraph(nfa.toDotFormat(), "DotGraph");
+
     parser.dump();
   }
+
+
+public static void createDotGraph(String dotFormat,String fileName)
+{
+    GraphViz gv=new GraphViz();
+    gv.addln(gv.start_graph());
+    gv.add(dotFormat);
+    gv.addln(gv.end_graph());
+   // String type = "gif";
+    String type = "pdf";
+  // gv.increaseDpi();
+    gv.decreaseDpi();
+    gv.decreaseDpi();
+
+    File out = new File(fileName+"."+ type);
+    gv.writeGraphToFile( gv.getGraph( gv.getDotSource(), type ), out );
+}
 
   final public SimpleNode Start() throws ParseException {
                      /*@bgen(jjtree) Start */

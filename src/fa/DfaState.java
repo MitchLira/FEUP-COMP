@@ -11,6 +11,10 @@ public class DfaState extends State<Integer> {
         edges = new HashMap<>();
     }
 
+    public HashMap<String, Integer> getEdges() {
+        return edges;
+    }
+
     @Override
     public void addEdge(String edgeID, Integer stateID) {
         edges.put(edgeID, stateID);
@@ -42,5 +46,7 @@ public class DfaState extends State<Integer> {
 
         return res;
     }
+
+
 
 }

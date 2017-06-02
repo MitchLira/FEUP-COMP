@@ -21,14 +21,22 @@ public class NFASet implements Convertable {
 			ExpressionSet expressionSet = new ExpressionSet(node);
 			sets.add(expressionSet);
 		}
+
+
+
+
 	}
 
 	@Override
 	public NFA convert() {
 		return new NFA(this);
-		
 	}
-	
+
+
+	public void setOperator(String operator) {
+		this.operator = operator;
+	}
+
 	public String getOperator() {
 		return operator;
 	}

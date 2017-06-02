@@ -7,6 +7,8 @@ import java.util.Map;
 public class NfaState extends State<ArrayList<Integer>> {
     private HashMap<String, ArrayList<Integer>> edges;
 
+
+
     public NfaState(boolean accept) {
         super(accept);
         edges = new HashMap<>();

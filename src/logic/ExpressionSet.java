@@ -26,7 +26,8 @@ public class ExpressionSet implements Convertable {
 				else
 					c = new NFASet((SimpleNode) node.jjtGetChild(0), ((SimpleNode) node.jjtGetChild(1)).name);
 			} else {
-				System.err.println("Erro no parser");
+				System.err.println("Parser Error");
+				System.out.println(GrammarParserTreeConstants.jjtNodeName[node.id]);
 				System.exit(-1);
 			}
 			

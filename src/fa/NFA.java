@@ -2,10 +2,9 @@ package fa;
 
 import java.util.*;
 
-import logic.Convertable;
-import logic.ExpressionSet;
-import logic.NFASet;
-import logic.Term;
+import logic.*;
+import utils.Pair;
+import utils.Utils;
 
 
 
@@ -29,19 +28,20 @@ public class NFA extends FA {
         	createStatesExpressionSet((ExpressionSet) convertable);
         else
         	createStatesNFASet((NFASet) convertable);
+
+        System.out.println(this.toDotFormat());
     }
 
 	private void createStatesTerm(Term term) {
         identifiers.add(term.getName());
-        lastState = (NfaState) startState;
-
+        lastState = startState;
         Integer lower = term.getPair().getLower();
         Integer upper = term.getPair().getUpper();
         
         if (lower == upper) {
             for (int i = 0; i < upper; i++) {
                 NfaState state = new NfaState();
-                addState(state);
+                this.addState(state);
                 startState.addEdge(term.getName(), state.getId());
                 lastState = state;
             }  
@@ -80,13 +80,16 @@ public class NFA extends FA {
         ArrayList<Convertable> list = expressionSet.getConvertables();
         
         NFA currentNFA;
-        lastState = new NfaState();
+
+        lastState  = startState;
         for (Convertable c : list) {
         	currentNFA = c.convert();
+        	states.putAll(currentNFA.getStates());
         	identifiers.addAll(currentNFA.getIdentifiers());
-        	startState.addEdge(EPSILON, currentNFA.startState.getId());
-        	
-        	currentNFA.lastState.addEdge(EPSILON, lastState.getId());
+
+            lastState.addEdge(EPSILON, currentNFA.startState.getId());
+            lastState = currentNFA.lastState;
+
         }
     }
 
@@ -94,17 +97,71 @@ public class NFA extends FA {
 	private void createStatesNFASet(NFASet nfaSet) {
         ArrayList<Convertable> list = nfaSet.getConvertables();
         
-        NFA currentNFA;
+
         lastState = new NfaState();
+        this.addState(lastState);
         for (Convertable c : list) {
-        	currentNFA = c.convert();
-        	identifiers.addAll(currentNFA.getIdentifiers());
+            NFA currentNFA = c.convert();
+            states.putAll(currentNFA.getStates());
+            identifiers.addAll(currentNFA.getIdentifiers());
         	startState.addEdge(EPSILON, currentNFA.startState.getId());
-        	
+
         	currentNFA.lastState.addEdge(EPSILON, lastState.getId());
         }
+
+
+
+        if(nfaSet.getOperator() != null){
+
+            Pair operatorRange = Utils.getOperatorRange(nfaSet.getOperator());
+            Integer lower = operatorRange.getLower();
+            Integer upper = operatorRange.getUpper();
+
+            nfaSet.setOperator(null);//stop recursion
+
+            if (lower == upper) {
+
+
+                for (int i = 0; i < upper; i++) {// 2
+                    NFA clone = nfaSet.convert();
+                    states.putAll(clone.getStates());
+                    lastState.addEdge(EPSILON, clone.startState.getId());
+                    lastState = clone.lastState;
+                }
+            } else if (lower != null && upper != null) {//{2,4}
+                for (int i = 0; i < lower; i++) {
+                    NFA clone = nfaSet.convert();
+                    states.putAll(clone.getStates());
+                    lastState.addEdge(EPSILON, clone.startState.getId());
+                    lastState = clone.lastState;
+                }
+
+                for (int i = lower; i < upper; i++) {
+                    NFA clone = nfaSet.convert();
+                    states.putAll(clone.getStates());
+                    lastState.addEdge(EPSILON, clone.startState.getId());
+                    lastState.addEdge(EPSILON, clone.lastState.getId());
+                    lastState = clone.lastState;
+                }
+            } else if (lower != null && upper == null) { // * , +
+
+                if(Operators.STAR.getValue() == lower){
+                    lastState.addEdge(EPSILON,startState.getId());
+                }else {
+
+                    NFA clone = nfaSet.convert();
+                    states.putAll(clone.getStates());
+                    lastState.addEdge(EPSILON, clone.startState.getId());
+                    lastState = clone.lastState;
+
+                    lastState.addEdge(EPSILON, clone.startState.getId());
+                }
+            }
+
+        }
 	}
-	
+
+
 
     //DFA STUFF
 
@@ -316,6 +373,26 @@ public class NFA extends FA {
                     break;
                 }
             }
+        }
+
+        return res;
+    }
+
+
+    public String toDotFormat(){
+        String res = "";
+
+        for(Map.Entry<Integer, State> entry : states.entrySet()) {
+            NfaState state = (NfaState) entry.getValue();
+            Integer stateId =  entry.getKey();
+
+            if(state.isAcceptState())
+                res += state.getId() + "[style=filled]";
+
+
+            for(Map.Entry<String, ArrayList<Integer>> entry1 : state.getEdges().entrySet())
+                for (Integer id:entry1.getValue())
+                 res += stateId + "->" + id + "[label=" + entry1.getKey() + "];";
         }
 
         return res;

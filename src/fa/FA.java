@@ -41,7 +41,17 @@ public abstract class FA {
 		return identifiers;
 	}
 
-	@Override
+    public HashMap<Integer, State> getStates() {
+        return states;
+    }
+
+    public State getLastState() {
+        return lastState;
+    }
+
+
+
+    @Override
     public String toString() {
         String res ="----------------FA States----------------\n";
 
@@ -58,4 +68,6 @@ public abstract class FA {
 
         return res;
     }
+
+
 }
