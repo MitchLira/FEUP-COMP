@@ -1,0 +1,102 @@
+options
+{
+  LOOKAHEAD=1;
+  STATIC=false;
+}
+
+PARSER_BEGIN(GrammarParser)
+package parser;
+
+import logic.NFASet;
+import fa.NFA;
+import gui.GraphViz;
+import java.io.File;
+import fa.DFA;
+
+public class GrammarParser {
+  public static void main(String args[]) throws ParseException {
+    GrammarParser gp = new GrammarParser(System.in);
+    SimpleNode root = gp.Start();
+
+    NFASet parser = new NFASet((SimpleNode) root.jjtGetChild(0), null);
+    NFA nfa = parser.convert();
+    nfa.getLastState().setAcceptState(true);
+    System.out.println(nfa.toString());
+
+
+    DFA dfa = nfa.getDFA();
+
+    System.out.println(nfa.toDotFormat());
+    createDotGraph(nfa.toDotFormat(), "Nfa");
+
+    System.out.println(dfa.toDotFormat());
+    createDotGraph(dfa.toDotFormat(), "Dfa");
+
+
+
+    parser.dump();
+  }
+
+
+public static void createDotGraph(String dotFormat,String fileName)
+{
+    GraphViz gv=new GraphViz();
+    gv.addln(gv.start_graph());
+    gv.add(dotFormat);
+    gv.addln(gv.end_graph());
+    String type = "pdf";
+    gv.decreaseDpi();
+    gv.decreaseDpi();
+
+    File out = new File(fileName+"."+ type);
+    gv.writeGraphToFile( gv.getGraph( gv.getDotSource(), type ), out );
+}
+
+}
+
+PARSER_END(GrammarParser)
+
+
+SKIP :
+{
+  " " | "\r" | "\t"
+}
+
+TOKEN: {
+  <INTERVAL: ( <INTEGER> ("," (<INTEGER>)? )? )> |
+  <OPERATOR: (["*", "+", "?"])> |
+  <INTEGER: (["0" - "9"]) > |
+  <LF: "\n"> |
+  <IDENTIFIER: (["A" - "Z"]) (["a" - "z", "0" - "9"])* >
+}
+
+SimpleNode Start(): {}
+{
+  NFASet() <LF> {return jjtThis;}
+}
+
+void NFASet(): {}
+{
+  ExpressionSet() ("|" ExpressionSet())*
+}
+
+void ExpressionSet(): {}
+{
+  (Expression())+
+}
+
+void Expression() #void: {Token identifier, op;}
+{
+  (   "(" NFASet() ")" (Operator())?   ) #SubNFA
+  |
+  (   identifier = <IDENTIFIER> { jjtThis.name = identifier.image;} (Operator())?  ) #Term
+}
+
+void Operator(): {Token op;}
+{
+  (
+    (   op = <OPERATOR>		)
+    |
+    ( "{" op = < INTERVAL >  "}" )
+  ) { jjtThis.name = op.image; }
+}

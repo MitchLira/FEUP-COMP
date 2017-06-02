@@ -1,0 +1,30 @@
+aspectdef CFlow
+   select pragma{"BasicBlock"} end
+    apply
+   	 $pragma.insert after %{cflow.logic.Utils.dfa.transition("[[$pragma.content]]");}%;
+    end
+
+
+ select method{"main"}.first_stmt end
+    apply
+        $first_stmt.insert before %{cflow.utils.Utils.initDfa("F2*");}%;
+    end
+
+
+ select method{'main'}.return end
+    apply
+        $return.insert before %{cflow.utils.Utils.dfaStatistics();}%;
+    end
+    condition
+        $return != null
+    end
+
+ select method{'main'}.last_stmt end
+    apply
+        $last_stmt.insert after %{cflow.utils.Utils.dfaStatistics();}%;
+    end
+    condition
+        $return == null
+    end
+
+end
