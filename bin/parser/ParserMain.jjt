@@ -1,0 +1,69 @@
+options
+{
+  LOOKAHEAD=1;
+  STATIC=false;
+}
+
+PARSER_BEGIN(GrammarParser)
+public class GrammarParser {
+  public static void main(String args[]) throws ParseException {
+    GrammarParser gp = new GrammarParser(System.in);
+    SimpleNode root = gp.Start();
+    root.dump("");
+  }
+}
+PARSER_END(GrammarParser)
+
+
+SKIP :
+{
+  " " | "\r" | "\t"
+}
+
+TOKEN: {
+  <OPERATOR: (["*", "+", "?"])> |
+  <INTEGER: (["0" - "9"]) > |
+  <LF: "\n"> |
+  <IDENTIFIER: (["A" - "Z"]) (["a" - "z", "0" - "9"])* >
+}
+
+SimpleNode Start(): {}
+{
+  NFASet() <LF> {return jjtThis;}
+}
+
+void NFASet(): {}
+{
+  ExpressionSet() ("|" ExpressionSet())*
+}
+
+void ExpressionSet(): {}
+{
+  (Expression())+
+}
+
+void Expression() #void: {Token identifier, op;}
+{
+  (   "(" NFASet() ")" (Operator())?   ) #SubNFA
+  |
+  (   identifier = <IDENTIFIER> { jjtThis.name = identifier.image;} (Operator())?  ) #Term
+}
+
+void Operator() #void: {Token op;}
+{
+  (
+    (   op = <OPERATOR> { jjtThis.name = op.image; } #Single   )
+    |
+    (   Interval()    )
+  )
+}
+
+void Interval(): {Token op1, op2;}
+{
+  "{" Number() ("," (Number())? )? "}"
+}
+
+void Number(): {Token num;}
+{
+  num = <INTEGER> { jjtThis.name = num.image; }
+}

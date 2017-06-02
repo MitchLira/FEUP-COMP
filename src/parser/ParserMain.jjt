@@ -1,0 +1,67 @@
+options
+{
+  LOOKAHEAD=1;
+  STATIC=false;
+}
+
+PARSER_BEGIN(GrammarParser)
+package parser;
+
+import logic.NFASet;
+
+public class GrammarParser {
+  public static void main(String args[]) throws ParseException {
+    GrammarParser gp = new GrammarParser(System.in);
+    SimpleNode root = gp.Start();
+
+    NFASet parser = new NFASet((SimpleNode) root.jjtGetChild(0), null);
+    parser.dump();
+  }
+}
+
+PARSER_END(GrammarParser)
+
+
+SKIP :
+{
+  " " | "\r" | "\t"
+}
+
+TOKEN: {
+  <INTERVAL: ( <INTEGER> ("," (<INTEGER>)? )? )> |
+  <OPERATOR: (["*", "+", "?"])> |
+  <INTEGER: (["0" - "9"]) > |
+  <LF: "\n"> |
+  <IDENTIFIER: (["A" - "Z"]) (["a" - "z", "0" - "9"])* >
+}
+
+SimpleNode Start(): {}
+{
+  NFASet() <LF> {return jjtThis;}
+}
+
+void NFASet(): {}
+{
+  ExpressionSet() ("|" ExpressionSet())*
+}
+
+void ExpressionSet(): {}
+{
+  (Expression())+
+}
+
+void Expression() #void: {Token identifier, op;}
+{
+  (   "(" NFASet() ")" (Operator())?   ) #SubNFA
+  |
+  (   identifier = <IDENTIFIER> { jjtThis.name = identifier.image;} (Operator())?  ) #Term
+}
+
+void Operator(): {Token op;}
+{
+  (
+    (   op = <OPERATOR>		)
+    |
+    ( "{" op = < INTERVAL >  "}" )
+  ) { jjtThis.name = op.image; }
+}
