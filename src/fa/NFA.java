@@ -169,29 +169,27 @@ public class NFA extends FA {
         //eClosure, the state as well as all the states reached with EPSILON(null)
 
         NfaState s = (NfaState) states.get(stateId);
-        ArrayList<Integer> res = s.getEdges().get(EPSILON);
+        ArrayList<Integer> res = new ArrayList<>(s.getEdges().get(EPSILON));
 
         if(res != null ) {
 
-            ArrayList<Integer> tmp = new ArrayList<>();
+
             for (int i = 0 ;i < res.size();i++) {
                 NfaState s1 = (NfaState) states.get(res.get(i));
                 ArrayList<Integer> t = s1.getEdges().get(EPSILON);
 
-                if(t!= null) {
-                    tmp.addAll(t);
+                if(t != null) {
 
-                    //if there is a new state reached with epsilon, add it to check if that state can lead to more unreached states
-                    if(!t.contains(res.get(i)))
-                        t.add(res.get(i));
+                    for (Integer reachedState : t) {
+                        if (!res.contains(reachedState))
+                            res.add(reachedState);
+                    }
                 }
 
             }
 
             if(!res.contains(stateId))
                 res.add(stateId);
-
-            res.addAll(tmp);
 
         }else{
             res = new ArrayList<>();
@@ -212,6 +210,8 @@ public class NFA extends FA {
         //the new states
         ArrayList<ArrayList<Integer>> newStates = new ArrayList<>();
         newStates.add(eClosure(this.startState.getId()));
+
+        System.out.println("Eclosure-> " + eClosure(this.startState.getId()));
         newStates.add(new ArrayList<>());//death state
 
         //rows of the table
@@ -377,6 +377,8 @@ public class NFA extends FA {
 
         return res;
     }
+
+
 
 
     public String toDotFormat(){

@@ -53,6 +53,7 @@ public abstract class FA {
 
     @Override
     public String toString() {
+
         String res ="----------------FA States----------------\n";
 
 
@@ -66,7 +67,11 @@ public abstract class FA {
         res += "******Current State*******\n" + currentState.toString() + "\n";
 
 
-        return res;
+        return res;/**/
+    }
+
+    public String toDotFormat(){
+        return new String();
     }
 
 
