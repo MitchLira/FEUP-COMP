@@ -1,0 +1,58 @@
+<script src="../libs/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+
+<div class="row">
+	<div class="col-xs-12">
+		<div class="form-group" id="JavaCodeFormGroup">
+			<h3>Java Code:</h3> 
+			<div class="ace_container">
+				<div class="editor" id="editor">
+
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-xs-12 regexDiv smallskip">
+		<div class="form-group">
+			<h3>Regex:</h3>			
+			<div>
+				<input class="regex" type="text" name="Regex">
+			</div>				
+			<br>		
+			<div class="col-xs-12 text-center">
+				<br>
+				<button type="submit" class="btn btn-default SubmitButton bigskip">Submit &nbsp<span class="glyphicon glyphicon-ok"></span></button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	$("#editor").html(`
+// Write your code here!
+
+public class HelloWorld {
+	public static void main(String[] args) {
+		System.out.println("Hello World");
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+`);
+	var editor = ace.edit("editor");
+	editor.setTheme("ace/theme/tomorrow");
+	editor.getSession().setMode("ace/mode/java");	
+</script>
