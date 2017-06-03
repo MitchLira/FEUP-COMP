@@ -6,9 +6,14 @@ import logic.NFASet;
 import parser.GrammarParser;
 import parser.SimpleNode;
 import gui.GraphViz;
+import weaver.gui.KadabraLauncher;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 public class Utils {
 
@@ -35,6 +40,9 @@ public class Utils {
 
             dfa = nfa.getDFA();
 
+            writeToFile("nfa",nfa.toDotFormat());
+            writeToFile("dfa",dfa.toDotFormat());
+
             createDotGraph(nfa.toDotFormat(), "Nfa");
             createDotGraph(dfa.toDotFormat(), "Dfa");
 
@@ -42,6 +50,7 @@ public class Utils {
 
         } catch (Throwable e) {
             System.out.println("Invalid REGEX!\n"+ e.getMessage());
+            e.printStackTrace();
             System.exit(1);
         }
 
@@ -49,6 +58,18 @@ public class Utils {
 
         System.out.println("-------------User Code------------\n");
     }
+
+    public static void writeToFile(String fileName,String content){
+        try{
+            PrintWriter writer = new PrintWriter(fileName, "UTF-8");
+            writer.println(content);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
 
     public static void dfaStatistics(){
         System.out.println("-------------Ended cflow execution------------\n");
@@ -59,7 +80,26 @@ public class Utils {
             System.out.println("Regex not acepted");
     }
 
+    public static void generateParsedCode(String srcPath, String dstPath){
+        try {
 
+            File src = new File("cflow/cflow.jar");
+            File dst = new File(dstPath + File.separator + src.getName());
+            Files.copy(src.toPath(), dst.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String[] args = new String[5];
+        args[0] = "cflow/lara/cflow.lara";
+        args[1] = "-p";
+        args[2] = srcPath;
+        args[3] = "-o";
+        args[4] = dstPath;
+
+        KadabraLauncher.main(args);
+    }
 
     //get the range based on regex operator
     public static Pair getOperatorRange(String operator){

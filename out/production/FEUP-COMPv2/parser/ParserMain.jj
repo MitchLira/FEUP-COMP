@@ -36,9 +36,6 @@ public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants
 
   }
 
-
-
-
 }
 
 PARSER_END(GrammarParser)
@@ -54,7 +51,8 @@ TOKEN: {
   <OPERATOR: (["*", "+", "?"])> |
   <INTEGER: (["0" - "9"]) > |
   <LF: "\n"> |
-  <IDENTIFIER: (["A" - "Z"]) (["a" - "z", "0" - "9"])* >
+  <IDENTIFIER: (["A" - "Z"]) (["a" - "z", "0" - "9"])* > |
+  <DOT: ".">
 }
 
 SimpleNode Start(): {/*@bgen(jjtree) Start */
@@ -193,7 +191,7 @@ void Expression()      : {Token identifier, op;}
   }
   try {
 /*@egen*/
-  (   identifier = <IDENTIFIER> { jjtn002.name = identifier.image;} (Operator())?  )/*@bgen(jjtree)*/
+  (   (identifier = <IDENTIFIER>) { jjtn002.name = identifier.image;} (Operator())?  )/*@bgen(jjtree)*/
   } catch (Throwable jjte002) {
     if (jjtc002) {
       jjtree.clearNodeScope(jjtn002);

@@ -69,14 +69,14 @@ public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants
       label_1:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case 9:
+        case 10:
           ;
           break;
         default:
           jj_la1[0] = jj_gen;
           break label_1;
         }
-        jj_consume_token(9);
+        jj_consume_token(10);
         ExpressionSet();
       }
     } catch (Throwable jjte000) {
@@ -111,7 +111,7 @@ public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants
         Expression();
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case IDENTIFIER:
-        case 10:
+        case 11:
           ;
           break;
         default:
@@ -143,17 +143,17 @@ public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants
   final public void Expression() throws ParseException {
                           Token identifier, op;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 10:
+    case 11:
     SimpleNode jjtn001 = new SimpleNode(JJTSUBNFA);
     boolean jjtc001 = true;
     jjtree.openNodeScope(jjtn001);
       try {
-        jj_consume_token(10);
-        NFASet();
         jj_consume_token(11);
+        NFASet();
+        jj_consume_token(12);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case OPERATOR:
-        case 12:
+        case 13:
           Operator();
           break;
         default:
@@ -186,10 +186,10 @@ public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants
     jjtree.openNodeScope(jjtn002);
       try {
         identifier = jj_consume_token(IDENTIFIER);
-                                  jjtn002.name = identifier.image;
+                                    jjtn002.name = identifier.image;
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case OPERATOR:
-        case 12:
+        case 13:
           Operator();
           break;
         default:
@@ -233,10 +233,10 @@ public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants
       case OPERATOR:
         op = jj_consume_token(OPERATOR);
         break;
-      case 12:
-        jj_consume_token(12);
-        op = jj_consume_token(INTERVAL);
+      case 13:
         jj_consume_token(13);
+        op = jj_consume_token(INTERVAL);
+        jj_consume_token(14);
         break;
       default:
         jj_la1[5] = jj_gen;
@@ -268,7 +268,7 @@ public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x200,0x500,0x1020,0x1020,0x500,0x1020,};
+      jj_la1_0 = new int[] {0x400,0x900,0x2020,0x2020,0x900,0x2020,};
    }
 
   /** Constructor with InputStream. */
@@ -388,7 +388,7 @@ public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[14];
+    boolean[] la1tokens = new boolean[15];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -402,7 +402,7 @@ public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants
         }
       }
     }
-    for (int i = 0; i < 14; i++) {
+    for (int i = 0; i < 15; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

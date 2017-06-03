@@ -22,9 +22,6 @@ public class NFASet implements Convertable {
 			sets.add(expressionSet);
 		}
 
-
-
-
 	}
 
 	@Override

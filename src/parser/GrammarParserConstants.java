@@ -20,6 +20,8 @@ public interface GrammarParserConstants {
   int LF = 7;
   /** RegularExpression Id. */
   int IDENTIFIER = 8;
+  /** RegularExpression Id. */
+  int DOT = 9;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -35,6 +37,7 @@ public interface GrammarParserConstants {
     "<INTEGER>",
     "\"\\n\"",
     "<IDENTIFIER>",
+    "\".\"",
     "\"|\"",
     "\"(\"",
     "\")\"",
