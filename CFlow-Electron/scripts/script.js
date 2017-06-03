@@ -2,13 +2,24 @@ const remote = require('electron').remote;
 const main = remote.require('./main.js');
 
 $(function() {
-    $("#tab1").load("quickTesting.html");
+    $("#tab1").load("quickTesting.html", function() {
+        
+    });
 
     $("#tab2").load("projectTesting.html", function() {
-        $("#uploadFolder").click(function(e) {
+        $(".uploadFolder").click(function(e) {
             var path = main.uploadFolder();
-            $("#folderPath").html(path);
+            $(this).next(".folderPath").html(path);
             e.preventDefault();
+        });
+
+        $("#tab2 .SubmitButton").click(() => {
+            var regex = $("#tab2 .regex").val();
+            main.updateRegex(regex);
+
+            var input = escapeSpaces($("#fromPath").html());
+            var output = escapeSpaces($("#toPath").html());
+            main.runCFlow(input, output, 'p1.pt');
         });
     });
 
@@ -91,3 +102,14 @@ $(function() {
         });
     });
 });
+
+
+
+function escapeSpaces(x) {
+    var words = x.split(" ");
+    for (var i = 0; i < words.length - 1; i++) {
+        words[i] += '\\';
+    }
+    x = words.join(" ");
+    return x;
+}
