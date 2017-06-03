@@ -129,32 +129,52 @@ public class NFA extends FA {
                     lastState = clone.lastState;
                 }
             } else if (lower != null && upper != null) {//{2,4}
+
+                boolean firstIteration=true;
                 for (int i = 0; i < lower; i++) {
-                    NFA clone = nfaSet.convert();
-                    states.putAll(clone.getStates());
-                    lastState.addEdge(EPSILON, clone.startState);
-                    lastState = clone.lastState;
+                    if(firstIteration){
+                        //the nfa already has its states no need to clone
+                        firstIteration=false;
+                    }else {
+                        NFA clone = nfaSet.convert();
+                        states.putAll(clone.getStates());
+                        lastState.addEdge(EPSILON, clone.startState);
+                        lastState = clone.lastState;
+                    }
                 }
 
                 for (int i = lower; i < upper; i++) {
-                    NFA clone = nfaSet.convert();
-                    states.putAll(clone.getStates());
-                    lastState.addEdge(EPSILON, clone.startState);
-                    lastState.addEdge(EPSILON, clone.lastState);
-                    lastState = clone.lastState;
+                    if(firstIteration){
+                        startState.addEdge(EPSILON,lastState);
+                        firstIteration=false;
+                    }else {
+                        NFA clone = nfaSet.convert();
+                        states.putAll(clone.getStates());
+                        lastState.addEdge(EPSILON, clone.startState);
+                        lastState.addEdge(EPSILON, clone.lastState);
+                        lastState = clone.lastState;
+                    }
+
+
                 }
-            } else if (lower != null && upper == null) { // * , +
+            } else if (lower != null && upper == null) { // * , +, {2,}
 
-                if(Operators.STAR.getValue() == lower){
+                if(Operators.STAR.getValue() == lower){// *
                     lastState.addEdge(EPSILON,startState);
-                }else {
+                }else {// + , {2, }
 
-                    NFA clone = nfaSet.convert();
-                    states.putAll(clone.getStates());
-                    lastState.addEdge(EPSILON, clone.startState);
-                    lastState = clone.lastState;
+                    State backEdgeState = startState;
 
-                    lastState.addEdge(EPSILON, clone.startState);
+                    for (int i = 1; i < lower; i++){
+                        NFA clone = nfaSet.convert();
+                        states.putAll(clone.getStates());
+                        lastState.addEdge(EPSILON, clone.startState);
+                        lastState = clone.lastState;
+                        backEdgeState=clone.startState;
+                    }
+
+                    lastState.addEdge(EPSILON, backEdgeState);
+
                 }
             }
 
@@ -208,13 +228,14 @@ public class NFA extends FA {
                             String key = inEdgesDeg2.getKey();
 
                             for (Integer stateBeingUpdatedId : inEdgesDeg2.getValue()) {//state to be updated
+                                System.out.println("\tstateBeingUpdatedId-> " + stateBeingUpdatedId);
                                 NfaState stateBeingUpdated = (NfaState) states.get(stateBeingUpdatedId);
                                 //add new edge
                                 stateBeingUpdated.addEdge(key, successor);
 
-                                //remove edge to intermediate
-
+                                //remove out and in edge to intermediate
                                 stateBeingUpdated.getOut_edges().get(key).remove((Integer) stateDeg2.getId());
+                                successor.getIn_edges().get(key).remove((Integer) stateDeg2.getId());
 
                                 //remove state
                                 states.remove(stateDeg2.getId());
