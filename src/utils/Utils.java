@@ -34,6 +34,7 @@ public class Utils {
             NFASet parser = new NFASet((SimpleNode) root.jjtGetChild(0), null);
             NFA nfa = parser.convert();
             nfa.getLastState().setAcceptState(true);
+            nfa.handleDots();
             nfa.optimize();
             System.out.println(nfa.toString());
 

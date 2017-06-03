@@ -70,7 +70,7 @@ void Expression() #void: {Token identifier, op;}
 {
   (   "(" NFASet() ")" (Operator())?   ) #SubNFA
   |
-  (   (identifier = <IDENTIFIER>) { jjtThis.name = identifier.image;} (Operator())?  ) #Term
+  (   (identifier = <IDENTIFIER> | identifier = <DOT> ) { jjtThis.name = identifier.image;} (Operator())?  ) #Term
 }
 
 void Operator(): {Token op;}

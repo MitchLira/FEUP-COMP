@@ -191,7 +191,7 @@ void Expression()      : {Token identifier, op;}
   }
   try {
 /*@egen*/
-  (   (identifier = <IDENTIFIER>) { jjtn002.name = identifier.image;} (Operator())?  )/*@bgen(jjtree)*/
+  (   (identifier = <IDENTIFIER> | identifier = <DOT> ) { jjtn002.name = identifier.image;} (Operator())?  )/*@bgen(jjtree)*/
   } catch (Throwable jjte002) {
     if (jjtc002) {
       jjtree.clearNodeScope(jjtn002);

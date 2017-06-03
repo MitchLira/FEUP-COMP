@@ -14,6 +14,8 @@ public class NFA extends FA {
     
     private Convertable convertable;
 
+
+
     public NFA(Convertable convertable) {
         super();
         this.convertable = convertable;
@@ -28,8 +30,7 @@ public class NFA extends FA {
         	createStatesExpressionSet((ExpressionSet) convertable);
         else
         	createStatesNFASet((NFASet) convertable);
-
-        System.out.println(this.toDotFormat());
+        
     }
 
 	private void createStatesTerm(Term term) {
@@ -181,6 +182,41 @@ public class NFA extends FA {
         }
 	}
 
+	public void handleDots(){
+        String DOT = ".";
+
+        for (Map.Entry<Integer,State> state: states.entrySet()){
+
+            NfaState currState = ((NfaState)state.getValue());
+
+            if(currState.getOut_edges().get(DOT) == null)
+                continue;
+
+            ArrayList<Integer> dotEdges = new ArrayList<>(currState.getOut_edges().get(DOT));
+
+
+            for (Integer edgeId : dotEdges){
+                NfaState dotReachedState = (NfaState) states.get(edgeId);
+
+
+                //remove DOT edge
+                currState.getOut_edges().get(DOT).remove((Integer) dotReachedState.getId());
+                dotReachedState.getIn_edges().get(DOT).remove((Integer) currState.getId());
+
+                //add edges will all the identifiers
+                identifiers.remove(DOT);
+                Iterator iter = identifiers.iterator();
+
+                while (iter.hasNext()) {
+                    String identifier = (String) iter.next();
+                    currState.addEdge(identifier,dotReachedState);
+                }
+            }
+
+            currState.getOut_edges().remove(DOT);
+        }
+    }
+
 
 
 	public void optimize(){//removes epsilon transactions when possible
@@ -230,7 +266,6 @@ public class NFA extends FA {
                                     removed = true;
 
                                 for (Integer stateBeingUpdatedId : inEdgesDeg2.getValue()) {//state to be updated
-                                    System.out.println("\tstateBeingUpdatedId-> " + stateBeingUpdatedId);
                                     NfaState stateBeingUpdated = (NfaState) states.get(stateBeingUpdatedId);
                                     //add new edge
                                     stateBeingUpdated.addEdge(key, successor);

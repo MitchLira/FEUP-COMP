@@ -111,6 +111,7 @@ public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants
         Expression();
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case IDENTIFIER:
+        case DOT:
         case 11:
           ;
           break;
@@ -181,19 +182,31 @@ public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants
       }
       break;
     case IDENTIFIER:
+    case DOT:
     SimpleNode jjtn002 = new SimpleNode(JJTTERM);
     boolean jjtc002 = true;
     jjtree.openNodeScope(jjtn002);
       try {
-        identifier = jj_consume_token(IDENTIFIER);
-                                    jjtn002.name = identifier.image;
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case IDENTIFIER:
+          identifier = jj_consume_token(IDENTIFIER);
+          break;
+        case DOT:
+          identifier = jj_consume_token(DOT);
+          break;
+        default:
+          jj_la1[3] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
+                                                          jjtn002.name = identifier.image;
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case OPERATOR:
         case 13:
           Operator();
           break;
         default:
-          jj_la1[3] = jj_gen;
+          jj_la1[4] = jj_gen;
           ;
         }
       } catch (Throwable jjte002) {
@@ -217,7 +230,7 @@ public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants
       }
       break;
     default:
-      jj_la1[4] = jj_gen;
+      jj_la1[5] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -239,7 +252,7 @@ public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants
         jj_consume_token(14);
         break;
       default:
-        jj_la1[5] = jj_gen;
+        jj_la1[6] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -262,13 +275,13 @@ public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[6];
+  final private int[] jj_la1 = new int[7];
   static private int[] jj_la1_0;
   static {
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x400,0x900,0x2020,0x2020,0x900,0x2020,};
+      jj_la1_0 = new int[] {0x400,0xb00,0x2020,0x300,0x2020,0xb00,0x2020,};
    }
 
   /** Constructor with InputStream. */
@@ -282,7 +295,7 @@ public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 7; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -297,7 +310,7 @@ public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants
     jj_ntk = -1;
     jjtree.reset();
     jj_gen = 0;
-    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 7; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -307,7 +320,7 @@ public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 7; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -318,7 +331,7 @@ public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants
     jj_ntk = -1;
     jjtree.reset();
     jj_gen = 0;
-    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 7; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -327,7 +340,7 @@ public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 7; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -337,7 +350,7 @@ public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants
     jj_ntk = -1;
     jjtree.reset();
     jj_gen = 0;
-    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 7; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -393,7 +406,7 @@ public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 7; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
