@@ -5,7 +5,7 @@ public class foo{
 
 	public static int test(){
 		int i = 0;
-/*
+
 		for(i = 0; i < 10; i++){
 			//@BasicBlock F1
 			if( (i % 2) == 0){
@@ -18,7 +18,7 @@ public class foo{
 
 			//@BasicBlock F2
 			continue;
-		}*/
+		}
 //@BasicBlock F2
 
 

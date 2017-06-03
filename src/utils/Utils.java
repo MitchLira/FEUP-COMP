@@ -104,8 +104,8 @@ public class Utils {
         gv.decreaseDpi();
         gv.decreaseDpi();
 
-        File out = new File(fileName+"."+ type);
-        gv.writeGraphToFile( gv.getGraph( gv.getDotSource(), type ), out );
+        File out = new File(fileName + "." + type);
+        gv.writeGraphToFile( gv.getGraph( gv.getDotSource(), type ), out);
     }
 
 }
