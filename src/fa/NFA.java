@@ -184,66 +184,76 @@ public class NFA extends FA {
 
 
 	public void optimize(){//removes epsilon transactions when possible
-//A+|B{1,}D*|(BC)?
 
         NfaState currState;
         HashMap<Integer, State> statesCloned = (HashMap)states.clone();
 
-        for(Map.Entry<Integer, State> entry : statesCloned.entrySet()) {
-            Integer id = entry.getKey();
 
-            if(states.get(id) == null)//already been removed
-                continue;
-            else
-                currState = (NfaState) entry.getValue();
+        boolean removed;
 
-            HashMap<String, ArrayList<Integer>> startEdges = currState.getOut_edges();
-            System.out.println("-----------current \t id-> " + currState.getId());
+        for(Map.Entry<Integer, State> entry : statesCloned.entrySet()) {//for each state of the nfa
 
-            for(Map.Entry<String, ArrayList<Integer>> startEdge : startEdges.entrySet()) {
+            do {
+                removed=false;
+                Integer id = entry.getKey();
 
-                ArrayList<Integer> transactions = new ArrayList(startEdge.getValue());
-                System.out.println("\t transactions-> " + transactions);
+                if (states.get(id) == null)//state already been removed
+                    continue;
+                else
+                    currState = (NfaState) entry.getValue();
 
+                HashMap<String, ArrayList<Integer>> startEdges = currState.getOut_edges();
 
+                for (Map.Entry<String, ArrayList<Integer>> startEdge : startEdges.entrySet()) {//for each edge of the current state being optimezed
 
-                for (Integer state2DegID : transactions) {// graph edges
-                    NfaState stateDeg2 = (NfaState) states.get(state2DegID);
-
-                    if(stateDeg2.getOut_edges() == null)
-                        continue;
-
-                    System.out.println("\tid-> " + state2DegID);
-                    System.out.println("\tin_edges-> " + stateDeg2.getIn_edges());
+                    ArrayList<Integer> transactions = new ArrayList(startEdge.getValue());
 
 
+                    for (Integer state2DegID : transactions) {// for each transaction the 2nd degree state
+                        NfaState stateDeg2 = (NfaState) states.get(state2DegID);
 
-                    ArrayList<Integer> edgesDeg2 = stateDeg2.getOut_edges().get(EPSILON) ;
-
-                    if (edgesDeg2 != null && edgesDeg2.size() == 1 && stateDeg2.getOut_edges().size() == 1) {//if the next state has only a epsilon transaction, we can remove this state
-                        NfaState successor = (NfaState) states.get(edgesDeg2.get(0));
+                        if (stateDeg2.getOut_edges() == null)
+                            continue;
 
 
-                        for (Map.Entry<String, ArrayList<Integer>> inEdgesDeg2 :  stateDeg2.getIn_edges().entrySet() ) {
-                            String key = inEdgesDeg2.getKey();
 
-                            for (Integer stateBeingUpdatedId : inEdgesDeg2.getValue()) {//state to be updated
-                                System.out.println("\tstateBeingUpdatedId-> " + stateBeingUpdatedId);
-                                NfaState stateBeingUpdated = (NfaState) states.get(stateBeingUpdatedId);
-                                //add new edge
-                                stateBeingUpdated.addEdge(key, successor);
+                        ArrayList<Integer> edgesDeg2 = stateDeg2.getOut_edges().get(EPSILON);
 
-                                //remove out and in edge to intermediate
-                                stateBeingUpdated.getOut_edges().get(key).remove((Integer) stateDeg2.getId());
-                                successor.getIn_edges().get(key).remove((Integer) stateDeg2.getId());
+                        if (edgesDeg2 != null && edgesDeg2.size() == 1 && stateDeg2.getOut_edges().size() == 1) {//if the next state has only a epsilon transaction, we can remove this state
+                            NfaState successor = (NfaState) states.get(edgesDeg2.get(0));
 
-                                //remove state
-                                states.remove(stateDeg2.getId());
+
+                            for (Map.Entry<String, ArrayList<Integer>> inEdgesDeg2 : stateDeg2.getIn_edges().entrySet()) {//for every in_edge of the state being removed, update the elements accordingly
+                                String key = inEdgesDeg2.getKey();
+
+                                if (inEdgesDeg2.getValue().size() > 0)
+                                    removed = true;
+
+                                for (Integer stateBeingUpdatedId : inEdgesDeg2.getValue()) {//state to be updated
+                                    System.out.println("\tstateBeingUpdatedId-> " + stateBeingUpdatedId);
+                                    NfaState stateBeingUpdated = (NfaState) states.get(stateBeingUpdatedId);
+                                    //add new edge
+                                    stateBeingUpdated.addEdge(key, successor);
+
+                                    //remove out and in edge to intermediate
+                                    stateBeingUpdated.getOut_edges().get(key).remove((Integer) stateDeg2.getId());
+                                }
                             }
+
+                            //remove out_edges
+                            for (Map.Entry<String, ArrayList<Integer>> outEdgesDeg2 : stateDeg2.getOut_edges().entrySet()) {
+                                for (Integer sucId : outEdgesDeg2.getValue()){
+                                    ((NfaState)states.get(sucId)).getIn_edges().get(outEdgesDeg2.getKey()).remove((Integer) stateDeg2.getId());
+                                }
+                            }
+                            //remove state
+                            states.remove(stateDeg2.getId());
                         }
                     }
+
                 }
-            }
+
+            }while (removed);
         }
     }
 

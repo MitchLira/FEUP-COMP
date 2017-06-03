@@ -18,7 +18,7 @@ public class DFA extends FA {
             onDeathState=true;
         else {
             currentState = states.get(stateId);
-            System.out.println("EdgeId-> " + edgeID + " Accept: " + currentState.isAcceptState());
+            System.out.println("Transaction with EdgeId: " + edgeID + "New state is aceppting state: " + currentState.isAcceptState());
         }
     }
 

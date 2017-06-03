@@ -9,49 +9,31 @@ package parser;
 
 import logic.NFASet;
 import fa.NFA;
-import gui.GraphViz;
-import java.io.File;
+import utils.Utils;
 import fa.DFA;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
+
+
 
 public class GrammarParser {
   public static void main(String args[]) throws ParseException {
-    GrammarParser gp = new GrammarParser(System.in);
-    SimpleNode root = gp.Start();
+    //read regex
+    try {
 
-    NFASet parser = new NFASet((SimpleNode) root.jjtGetChild(0), null);
-    NFA nfa = parser.convert();
-    nfa.getLastState().setAcceptState(true);
-    nfa.optimize();
-    System.out.println(nfa.toString());
+    BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+    String regex = bufferRead.readLine();
 
+    Utils.initDfa(regex);
+    }catch (IOException e) {
+      e.printStackTrace();
+    }
 
-    DFA dfa = nfa.getDFA();
-
-    System.out.println(nfa.toDotFormat());
-    createDotGraph(nfa.toDotFormat(), "Nfa");
-
-    System.out.println(dfa.toDotFormat());
-    createDotGraph(dfa.toDotFormat(), "Dfa");
-
-
-
-    parser.dump();
   }
 
 
-public static void createDotGraph(String dotFormat,String fileName)
-{
-    GraphViz gv=new GraphViz();
-    gv.addln(gv.start_graph());
-    gv.add(dotFormat);
-    gv.addln(gv.end_graph());
-    String type = "pdf";
-    gv.decreaseDpi();
-    gv.decreaseDpi();
 
-    File out = new File(fileName+"."+ type);
-    gv.writeGraphToFile( gv.getGraph( gv.getDotSource(), type ), out );
-}
 
 }
 

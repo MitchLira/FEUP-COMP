@@ -21,7 +21,7 @@ public class foo {
         }
          */
         // @BasicBlock F2
-        cflow.logic.Utils.dfa.transition("F2");
+        utils.Utils.dfa.transition("F2");
         return 0;
     }
 }

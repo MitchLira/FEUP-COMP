@@ -5,8 +5,11 @@ import weaver.gui.KadabraLauncher;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+
 import java.io.File;
+import java.nio.file.Files;
 import java.io.IOException;
+import java.nio.file.StandardCopyOption;
 
 import org.apache.commons.io.FileUtils;
 
@@ -57,10 +60,10 @@ public class CFlow {
         startButton.addActionListener((ActionEvent actionEvent) -> {
 
                 try {
-
-                    File srcDir = new File("src");
-                    File outDir = new File(srcOut.getText()+"/cflow");
-                    FileUtils.copyDirectory(srcDir,outDir);
+                    File src = new File("out/artifacts/Cflow_jar/cflow.jar");
+                    File dst = new File(srcOut.getText() + File.separator + src.getName());
+                    //FileUtils.copyDirectory(srcDir,outDir);
+                    Files.copy(src.toPath(), dst.toPath() , StandardCopyOption.REPLACE_EXISTING);
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -83,7 +86,9 @@ public class CFlow {
 
     public  static void main(String [] args) throws Exception {
         //To compile a java project:
-            //javac -d bin -sourcepath src -Xlint $(find . -name \*.java)
+            //javac -d bin -Xlint $(find . -name \*.java) -cp laraOutput/cflow.jar
+        //To run with jar
+            //java -cp .:../laraOutput/cflow.jar p1.pt
 
         CFlow cflow = new CFlow();
 

@@ -5,8 +5,10 @@ import fa.NFA;
 import logic.NFASet;
 import parser.GrammarParser;
 import parser.SimpleNode;
+import gui.GraphViz;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 
 public class Utils {
 
@@ -27,10 +29,16 @@ public class Utils {
             NFASet parser = new NFASet((SimpleNode) root.jjtGetChild(0), null);
             NFA nfa = parser.convert();
             nfa.getLastState().setAcceptState(true);
+            nfa.optimize();
             System.out.println(nfa.toString());
 
 
-            DFA dfa = nfa.getDFA();
+            dfa = nfa.getDFA();
+
+            createDotGraph(nfa.toDotFormat(), "Nfa");
+            createDotGraph(dfa.toDotFormat(), "Dfa");
+
+            parser.dump();
 
         } catch (Throwable e) {
             System.out.println("Invalid REGEX!\n"+ e.getMessage());
@@ -86,5 +94,18 @@ public class Utils {
         return  new Pair(lower,upper);
     }
 
+    public static void createDotGraph(String dotFormat,String fileName)
+    {
+        GraphViz gv=new GraphViz();
+        gv.addln(gv.start_graph());
+        gv.add(dotFormat);
+        gv.addln(gv.end_graph());
+        String type = "pdf";
+        gv.decreaseDpi();
+        gv.decreaseDpi();
+
+        File out = new File(fileName+"."+ type);
+        gv.writeGraphToFile( gv.getGraph( gv.getDotSource(), type ), out );
+    }
 
 }
