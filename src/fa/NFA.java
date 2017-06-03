@@ -42,14 +42,14 @@ public class NFA extends FA {
             for (int i = 0; i < upper; i++) {
                 NfaState state = new NfaState();
                 this.addState(state);
-                startState.addEdge(term.getName(), state.getId());
+                startState.addEdge(term.getName(), state);
                 lastState = state;
             }  
         } else if (lower != null && upper != null) {
             for (int i = 0; i < lower; i++) {
                 NfaState state = new NfaState();
                 this.addState(state);
-                lastState.addEdge(term.getName(), state.getId());
+                lastState.addEdge(term.getName(), state);
                 lastState = state;
             }
 
@@ -57,8 +57,8 @@ public class NFA extends FA {
 
                 NfaState state = new NfaState();
                 this.addState(state);
-                lastState.addEdge(term.getName(), state.getId());
-                lastState.addEdge(EPSILON, state.getId());
+                lastState.addEdge(term.getName(), state);
+                lastState.addEdge(EPSILON, state);
                 lastState = state;
             }
         } else if (lower != null && upper == null) {
@@ -66,11 +66,11 @@ public class NFA extends FA {
             for (int i = 0; i < lower; i++) {
                 NfaState state = new NfaState();
                 this.addState(state);
-                lastState.addEdge(term.getName(), state.getId());
+                lastState.addEdge(term.getName(), state);
                 lastState = state;
             }
 
-            lastState.addEdge(term.getName(), lastState.getId());
+            lastState.addEdge(term.getName(), lastState);
         }
     }
 	
@@ -87,7 +87,7 @@ public class NFA extends FA {
         	states.putAll(currentNFA.getStates());
         	identifiers.addAll(currentNFA.getIdentifiers());
 
-            lastState.addEdge(EPSILON, currentNFA.startState.getId());
+            lastState.addEdge(EPSILON, currentNFA.startState);
             lastState = currentNFA.lastState;
 
         }
@@ -104,9 +104,9 @@ public class NFA extends FA {
             NFA currentNFA = c.convert();
             states.putAll(currentNFA.getStates());
             identifiers.addAll(currentNFA.getIdentifiers());
-        	startState.addEdge(EPSILON, currentNFA.startState.getId());
+        	startState.addEdge(EPSILON, currentNFA.startState);
 
-        	currentNFA.lastState.addEdge(EPSILON, lastState.getId());
+        	currentNFA.lastState.addEdge(EPSILON, lastState);
         }
 
 
@@ -125,36 +125,36 @@ public class NFA extends FA {
                 for (int i = 0; i < upper; i++) {// 2
                     NFA clone = nfaSet.convert();
                     states.putAll(clone.getStates());
-                    lastState.addEdge(EPSILON, clone.startState.getId());
+                    lastState.addEdge(EPSILON, clone.startState);
                     lastState = clone.lastState;
                 }
             } else if (lower != null && upper != null) {//{2,4}
                 for (int i = 0; i < lower; i++) {
                     NFA clone = nfaSet.convert();
                     states.putAll(clone.getStates());
-                    lastState.addEdge(EPSILON, clone.startState.getId());
+                    lastState.addEdge(EPSILON, clone.startState);
                     lastState = clone.lastState;
                 }
 
                 for (int i = lower; i < upper; i++) {
                     NFA clone = nfaSet.convert();
                     states.putAll(clone.getStates());
-                    lastState.addEdge(EPSILON, clone.startState.getId());
-                    lastState.addEdge(EPSILON, clone.lastState.getId());
+                    lastState.addEdge(EPSILON, clone.startState);
+                    lastState.addEdge(EPSILON, clone.lastState);
                     lastState = clone.lastState;
                 }
             } else if (lower != null && upper == null) { // * , +
 
                 if(Operators.STAR.getValue() == lower){
-                    lastState.addEdge(EPSILON,startState.getId());
+                    lastState.addEdge(EPSILON,startState);
                 }else {
 
                     NFA clone = nfaSet.convert();
                     states.putAll(clone.getStates());
-                    lastState.addEdge(EPSILON, clone.startState.getId());
+                    lastState.addEdge(EPSILON, clone.startState);
                     lastState = clone.lastState;
 
-                    lastState.addEdge(EPSILON, clone.startState.getId());
+                    lastState.addEdge(EPSILON, clone.startState);
                 }
             }
 
@@ -163,20 +163,105 @@ public class NFA extends FA {
 
 
 
+	public void optimize(){//removes epsilon transactions when possible
+//A+|B{1,}D*|(BC)?
+
+        NfaState currState;
+        HashMap<Integer, State> statesCloned = (HashMap)states.clone();
+
+        for(Map.Entry<Integer, State> entry : statesCloned.entrySet()) {
+            Integer id = entry.getKey();
+
+            if(states.get(id) == null)//already been removed
+                continue;
+            else
+                currState = (NfaState) entry.getValue();
+
+            HashMap<String, ArrayList<Integer>> startEdges = currState.getOut_edges();
+            System.out.println("-----------current \t id-> " + currState.getId());
+
+            for(Map.Entry<String, ArrayList<Integer>> startEdge : startEdges.entrySet()) {
+
+                ArrayList<Integer> transactions = new ArrayList(startEdge.getValue());
+                System.out.println("\t transactions-> " + transactions);
+
+
+
+                for (Integer state2DegID : transactions) {// graph edges
+                    NfaState stateDeg2 = (NfaState) states.get(state2DegID);
+
+                    if(stateDeg2.getOut_edges() == null)
+                        continue;
+
+                    System.out.println("\tid-> " + state2DegID);
+                    System.out.println("\tin_edges-> " + stateDeg2.getIn_edges());
+
+
+
+                    ArrayList<Integer> edgesDeg2 = stateDeg2.getOut_edges().get(EPSILON) ;
+
+                    if (edgesDeg2 != null && edgesDeg2.size() == 1 && stateDeg2.getOut_edges().size() == 1) {//if the next state has only a epsilon transaction, we can remove this state
+                        NfaState successor = (NfaState) states.get(edgesDeg2.get(0));
+
+
+                        for (Map.Entry<String, ArrayList<Integer>> inEdgesDeg2 :  stateDeg2.getIn_edges().entrySet() ) {
+                            String key = inEdgesDeg2.getKey();
+
+                            for (Integer stateBeingUpdatedId : inEdgesDeg2.getValue()) {//state to be updated
+                                NfaState stateBeingUpdated = (NfaState) states.get(stateBeingUpdatedId);
+                                //add new edge
+                                stateBeingUpdated.addEdge(key, successor);
+
+                                //remove edge to intermediate
+
+                                stateBeingUpdated.getOut_edges().get(key).remove((Integer) stateDeg2.getId());
+
+                                //remove state
+                                states.remove(stateDeg2.getId());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    public String toDotFormat(){
+        String res = "";
+
+        for(Map.Entry<Integer, State> entry : states.entrySet()) {
+            NfaState state = (NfaState) entry.getValue();
+            Integer stateId =  entry.getKey();
+
+            if(state.isAcceptState())
+                res += state.getId() + "[style=filled]";
+
+
+            for(Map.Entry<String, ArrayList<Integer>> entry1 : state.getOut_edges().entrySet())
+                for (Integer id:entry1.getValue())
+                    res += stateId + "->" + id + "[label=" + entry1.getKey() + "];";
+        }
+
+        return res;
+    }
+
+
     //DFA STUFF
 
     public ArrayList<Integer> eClosure(int stateId){
         //eClosure, the state as well as all the states reached with EPSILON(null)
 
         NfaState s = (NfaState) states.get(stateId);
-        ArrayList<Integer> res = new ArrayList<>(s.getEdges().get(EPSILON));
+        ArrayList<Integer> res;
 
-        if(res != null ) {
 
+        if(s.getOut_edges().get(EPSILON) != null ) {
+            res = new ArrayList<>(s.getOut_edges().get(EPSILON));
 
             for (int i = 0 ;i < res.size();i++) {
                 NfaState s1 = (NfaState) states.get(res.get(i));
-                ArrayList<Integer> t = s1.getEdges().get(EPSILON);
+                ArrayList<Integer> t = s1.getOut_edges().get(EPSILON);
 
                 if(t != null) {
 
@@ -239,7 +324,7 @@ public class NFA extends FA {
                     NfaState state = (NfaState) states.get(currState.get(i));
 
                     //get all the states reached by the current identifier without counting with EPSILON
-                    ArrayList<Integer> statesReached = state.getEdges().get(currIdentifier);
+                    ArrayList<Integer> statesReached = state.getOut_edges().get(currIdentifier);
 
                     if(statesReached != null) {
 
@@ -311,7 +396,7 @@ public class NFA extends FA {
         //create dfa states
 
         ArrayList<DfaState> dfaStates = new ArrayList<>();
-        HashMap<String,Integer> ids = new HashMap<>();
+        HashMap<String,State> ids = new HashMap<>();
 
 
 
@@ -329,7 +414,7 @@ public class NFA extends FA {
             dfaStates.add(newDfaState);
             dfa.addState(newDfaState);
 
-            ids.put(state.toString(),newDfaState.getId());
+            ids.put(state.toString(),newDfaState);
 
         }
 
@@ -381,22 +466,4 @@ public class NFA extends FA {
 
 
 
-    public String toDotFormat(){
-        String res = "";
-
-        for(Map.Entry<Integer, State> entry : states.entrySet()) {
-            NfaState state = (NfaState) entry.getValue();
-            Integer stateId =  entry.getKey();
-
-            if(state.isAcceptState())
-                res += state.getId() + "[style=filled]";
-
-
-            for(Map.Entry<String, ArrayList<Integer>> entry1 : state.getEdges().entrySet())
-                for (Integer id:entry1.getValue())
-                 res += stateId + "->" + id + "[label=" + entry1.getKey() + "];";
-        }
-
-        return res;
-    }
 }

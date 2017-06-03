@@ -4,32 +4,43 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DfaState extends State<Integer> {
-    private HashMap<String, Integer> edges;
+    private HashMap<String, Integer> out_edges;
+    private HashMap<String, Integer> in_edges;
+
 
     public DfaState(boolean accept) {
         super(accept);
-        edges = new HashMap<>();
-    }
-
-    public HashMap<String, Integer> getEdges() {
-        return edges;
+        out_edges = new HashMap<>();
+        in_edges = new HashMap<>();
     }
 
     @Override
-    public void addEdge(String edgeID, Integer stateID) {
-        edges.put(edgeID, stateID);
+    public void addEdge(String edgeID, State state) {
+        out_edges.put(edgeID, state.getId());
+        addInEdge(edgeID,getId());
     }
+
+    @Override
+    public void addInEdge(String edgeID, int stateId) {
+        in_edges.put(edgeID, stateId);
+    }
+
+    public HashMap<String, Integer> getOut_edges() {
+        return out_edges;
+    }
+
+
 
     @Override
     public Integer transition(String edgeID) {
-        return edges.get(edgeID);
+        return out_edges.get(edgeID);
     }
 
     @Override
     public String toString() {
         String res= "---------DfaState--------- \nId -> " + getId() + "\nAcceptState-> " + isAcceptState() + "\nEdges: ";
 
-        for (Map.Entry<String, Integer> entry : edges.entrySet()){
+        for (Map.Entry<String, Integer> entry : out_edges.entrySet()){
             String key = entry.getKey();
             Integer state = entry.getValue();
 
@@ -38,8 +49,8 @@ public class DfaState extends State<Integer> {
             res += "\n";
         }
 
-        if(edges.size() == 0)
-            res += "\n\t This state doesn't have any edges";
+        if(out_edges.size() == 0)
+            res += "\n\t This state doesn't have any out_edges";
 
         res += "\n----------------------------";
 

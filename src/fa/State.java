@@ -10,7 +10,9 @@ public abstract class State<T> {
         this.acceptState = acceptState;
     }
 
-    public abstract void addEdge(String edgeID, Integer stateID);
+    public abstract void addEdge(String edgeID, State state);
+    public abstract void addInEdge(String edgeID, int stateId);
+
     public abstract T transition(String edgeID);
 
     public static int getLastId() {

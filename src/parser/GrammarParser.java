@@ -15,10 +15,11 @@ public class GrammarParser/*@bgen(jjtree)*/implements GrammarParserTreeConstants
     NFASet parser = new NFASet((SimpleNode) root.jjtGetChild(0), null);
     NFA nfa = parser.convert();
     nfa.getLastState().setAcceptState(true);
+    nfa.optimize();
     System.out.println(nfa.toString());
 
 
-    DFA dfa= nfa.getDFA();
+    DFA dfa = nfa.getDFA();
 
     System.out.println(nfa.toDotFormat());
     createDotGraph(nfa.toDotFormat(), "Nfa");

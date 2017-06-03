@@ -33,7 +33,7 @@ public class DFA extends FA {
                 res += state.getId() + "[style=filled]";
 
 
-            for(Map.Entry<String, Integer> entry1 : state.getEdges().entrySet())
+            for(Map.Entry<String, Integer> entry1 : state.getOut_edges().entrySet())
                 res += stateId + "->" + entry1.getValue() + "[label=" + entry1.getKey() + "];";
 
         }
