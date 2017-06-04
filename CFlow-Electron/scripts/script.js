@@ -16,10 +16,13 @@ $(function() {
             main.updateRegex(regex);
             main.updateIdentifiersLara('cflow/tmp_files/out');
 
-            var filename = /.* class ([\w]*)/.exec(editor.getValue())[1] + ".java";
-            
-            main.fs.writeFileSync('cflow/tmp_files/' + filename, editor.getValue());
-            main.runCFlow('cflow/tmp_files/' + filename, 'cflow/tmp_files/out');
+            var classname = /.* class ([\w]*)/.exec(editor.getValue())[1];
+            var filename =  classname + ".java";
+            var srcFilePath = main.rootdirname + '/cflow/tmp_files/main';
+            var dstFilePath = main.rootdirname + '/cflow/tmp_files/out';
+
+            main.fs.writeFileSync(srcFilePath + '/' + filename, editor.getValue());
+            main.runCFlow(srcFilePath, dstFilePath, classname);
         });
 
 

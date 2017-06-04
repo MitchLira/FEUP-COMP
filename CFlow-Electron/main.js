@@ -11,6 +11,9 @@ app.on('ready', () => {
     window.loadURL(`file://${__dirname}/pages/main.html`);
 });
 
+
+exports.rootdirname = __dirname;
+
 exports.fs = fs;
 
 exports.uploadFolder = function() {
@@ -69,7 +72,6 @@ end`;
     
     fs.writeFile('cflow/lara/identifiers.lara', lara);
 }
-
 
 
 exports.runCFlow = function(input, output, command) {
