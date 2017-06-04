@@ -6,28 +6,6 @@
 			<h3>Java Code:</h3> 
 			<div class="ace_container">
 				<div class="editor" id="editor">
-
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="col-xs-12 regexDiv smallskip">
-		<div class="form-group">
-			<h3>Regex:</h3>			
-			<div>
-				<input class="regex" type="text" name="Regex">
-			</div>				
-			<br>		
-			<div class="col-xs-12 text-center">
-				<br>
-				<button type="submit" class="btn btn-default SubmitButton bigskip">Submit &nbsp<span class="glyphicon glyphicon-ok"></span></button>
-			</div>
-		</div>
-	</div>
-</div>
-
-<script>
-	$("#editor").html(`
 // Write your code here!
 
 public class HelloWorld {
@@ -51,8 +29,24 @@ public class HelloWorld {
 
 
 
-`);
-	var editor = ace.edit("editor");
-	editor.setTheme("ace/theme/tomorrow");
-	editor.getSession().setMode("ace/mode/java");	
-</script>
+
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-xs-12 regexDiv smallskip">
+		<div class="form-group">
+			<h3>Regex:</h3>			
+			<div>
+				<input class="regex" type="text" name="Regex">
+			</div>				
+			<br>		
+			<div class="col-xs-12 text-center">
+				<br>
+				<button type="submit" class="btn btn-default SubmitButton bigskip" id="quickTest_Submit">Submit &nbsp<span class="glyphicon glyphicon-ok"></span></button>
+			</div>
+		</div>
+	</div>
+</div>
+
+

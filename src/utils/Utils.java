@@ -3,6 +3,7 @@ package utils;
 import fa.DFA;
 import fa.NFA;
 import logic.NFASet;
+import org.apache.commons.io.IOUtils;
 import parser.GrammarParser;
 import parser.SimpleNode;
 import gui.GraphViz;
@@ -19,8 +20,9 @@ public class Utils {
 
     public static DFA dfa;
 
-    public static void initDfa(String regex){
+    public static void initDfa(String regex)   {
         System.out.println("-------------Starting cflow execution------------\n");
+
 
 
         try {
@@ -44,8 +46,9 @@ public class Utils {
             writeToFile("nfa",nfa.toDotFormat());
             writeToFile("dfa",dfa.toDotFormat());
 
-            createDotGraph(nfa.toDotFormat(), "Nfa");
+           /* createDotGraph(nfa.toDotFormat(), "Nfa");
             createDotGraph(dfa.toDotFormat(), "Dfa");
+*/
 
             parser.dump();
 
@@ -81,23 +84,20 @@ public class Utils {
             System.out.println("Regex not acepted");
     }
 
-    public static void generateParsedCode(String srcPath, String dstPath){
-        try {
+    public static void generateParsedCode(String srcPath, String dstPath) throws IOException{
 
-            File src = new File("cflow/cflow.jar");
-            File dst = new File(dstPath + File.separator + src.getName());
-            Files.copy(src.toPath(), dst.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        File src = new File("cflow/cflow.jar");
+        File dst = new File(dstPath + File.separator + src.getName());
+        Files.copy(src.toPath(), dst.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
 
         String[] args = new String[5];
         args[0] = "cflow/lara/cflow.lara";
         args[1] = "-p";
-        args[2] = srcPath;
+        args[2] = srcPath ;
         args[3] = "-o";
-        args[4] = dstPath;
+        args[4] = dstPath + "/cflowCode";
 
         KadabraLauncher.main(args);
     }

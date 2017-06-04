@@ -11,6 +11,7 @@ app.on('ready', () => {
     window.loadURL(`file://${__dirname}/pages/main.html`);
 });
 
+exports.fs = fs;
 
 exports.uploadFolder = function() {
     return dialog.showOpenDialog({
@@ -24,9 +25,9 @@ exports.updateRegex = function(regex) {
 `aspectdef CFlow
     select pragma{"BasicBlock"} end
         apply
-        $pragma.insert after %{utils.Utils.dfa.transition("[[$pragma.content]]");}%;
+        $pragma.insert after  %{utils.Utils.dfa.transition("[[$pragma.content]]");}%;
         end
-
+      
 
     select method{"main"}.first_stmt end
         apply
@@ -50,29 +51,15 @@ exports.updateRegex = function(regex) {
             $return == null
         end
 end`;
-
+    
+    
     fs.writeFile('cflow/lara/cflow.lara', lara);
 }
 
-exports.generateCode = function(input, output) {
-    const ls = spawn('sh', ['cflow/bash/generateCode.sh', input, output]);
-
-    ls.stdout.on('data', (data) => {
-        console.log(`stdout: ${data}`);
-    });
-
-    ls.stderr.on('data', (data) => {
-        console.log(`stderr: ${data}`);
-    });
-
-    ls.on('close', (code) => {
-        console.log(`child process exited with code ${code}`);
-    });
-}
 
 
 exports.runCFlow = function(input, output, command) {
-    const sh = spawn('sh', ['cflow/bash/generateCode.sh', input, output]);
+    const sh = spawn('bash', ['cflow/bash/generateCode.sh', input, output]);
 
     sh.stdout.on('data', (data) => {
         console.log(`stdout: ${data}`);
@@ -90,7 +77,7 @@ exports.runCFlow = function(input, output, command) {
 
 
 exports.runCode = function(path, command) {
-    const sh = spawn('sh', ['cflow/bash/runCFlow.sh', path, command]);
+    const sh = spawn('bash', ['cflow/bash/runCFlow.sh', path, command]);
 
     sh.stdout.on('data', (data) => {
         console.log(`stdout: ${data}`);

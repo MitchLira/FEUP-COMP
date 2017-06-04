@@ -1,13 +1,13 @@
 aspectdef CFlow
     select pragma{"BasicBlock"} end
         apply
-        $pragma.insert after %{utils.Utils.dfa.transition("[[$pragma.content]]");}%;
+        $pragma.insert after  %{utils.Utils.dfa.transition("[[$pragma.content]]");}%;
         end
-
+      
 
     select method{"main"}.first_stmt end
         apply
-            $first_stmt.insert before %{utils.Utils.initDfa("F2");}%;
+            $first_stmt.insert before %{utils.Utils.initDfa("ASD");}%;
         end
 
 

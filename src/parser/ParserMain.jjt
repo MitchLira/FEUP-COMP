@@ -45,7 +45,7 @@ SKIP :
 TOKEN: {
   <INTERVAL: ( <INTEGER> ("," (<INTEGER>)? )? )> |
   <OPERATOR: (["*", "+", "?"])> |
-  <INTEGER: (["0" - "9"]) > |
+  <INTEGER: (["0" - "9"])+ > |
   <LF: "\n"> |
   <IDENTIFIER: (["A" - "Z"]) (["a" - "z", "0" - "9"])* > |
   <DOT: ".">

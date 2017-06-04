@@ -1,9 +1,26 @@
 const remote = require('electron').remote;
 const main = remote.require('./main.js');
+var output;
+
 
 $(function() {
+   
+
     $("#tab1").load("quickTesting.html", function() {
+        var editor = ace.edit("editor");
+        editor.setTheme("ace/theme/tomorrow");
+        editor.getSession().setMode("ace/mode/java");	
         
+        $("#quickTest_Submit").click(function(e){
+            var regex = $("#tab1 .regex").val();
+            main.updateRegex(regex);
+
+            main.fs.writeFileSync('cflow/tmp_files/code.java', editor.getValue());
+            main.runCFlow('cflow/tmp_files/code.java','cflow/tmp_files/out');
+        });
+
+
+
     });
 
     $("#tab2").load("projectTesting.html", function() {
@@ -18,15 +35,33 @@ $(function() {
             main.updateRegex(regex);
 
             var input = escapeSpaces($("#fromPath").html());
-            var output = escapeSpaces($("#toPath").html());
+            output = escapeSpaces($("#toPath").html());
             main.runCFlow(input, output, 'p1.pt');
         });
     });
 
     $("#tab3").load("results.html", function() {
-        $("#tab3").click(() => {
+       $("a[href='#tab3']").click(() => {
+
+            var nfaDot = main.fs.readFileSync(output + "/bin/nfa");
+              console.log("nfa->" + nfaDot );
+            createGraph("nfa",nfaDot);
+            
+            var dfaDot = main.fs.readFileSync(output + "/bin/dfa");
+            createGraph("dfa",dfaDot);
+
+       });
+
+     
+
+    });
+});
+
+
+function createGraph(id,dotString){
+ 
             // provide data in the DOT language
-            var DOTstring = 'dinetwork {1 -> 1 -> 2; 2 -> 3; 2 -- 4; 2 -> 1 }';
+            var DOTstring = 'dinetwork{' + dotString + '}';
             var parsedData = vis.network.convertDot(DOTstring);
 
             var data = {
@@ -35,74 +70,14 @@ $(function() {
             }
 
             var options = {
-                autoResize: true,
-                height: '100%',
-                width: '100%',
-                locale: 'en',
-                clickToUse: false,
-                edges: {
-                    arrows: {
-                        to: { enabled: true, scaleFactor: 1, type: 'arrow' },
-                        middle: { enabled: false, scaleFactor: 1, type: 'arrow' },
-                        from: { enabled: false, scaleFactor: 1, type: 'arrow' }
-                    },
-                    selectionWidth: 1,
-                    smooth: {
-                        enabled: false
-                    }
-                },
-                layout: {
-                    randomSeed: undefined,
-                    hierarchical: {
-                        improvedLayout: true,
-                        enabled: true,
-                        levelSeparation: 150,
-                        nodeSpacing: 100,
-                        treeSpacing: 200,
-                        blockShifting: true,
-                        edgeMinimization: true,
-                        parentCentralization: true,
-                        direction: 'UD',        // UD, DU, LR, RL
-                        sortMethod: 'directed'   // hubsize, directed
-                    }
-                },
-                nodes: {
-                    shape: 'box',
-                    
-                    color: {
-                        border: '#cccccc',
-                        background: '#cccccc',
-                        highlight: {
-                            border: '#cccccc',
-                            background: '#cccccc'
-                        },
-                        hover: {
-                            border: '#cccccc',
-                            background: '#cccccc'
-                        }
-                    },
-                    font: {
-                        color: 'white'
-                    }
-                },
-                interaction: {
-                    selectConnectedEdges: false
-                },
-                groups: {
-                    criticalPath: { color: { background: 'red' }, borderWidth: 3 }
-                },
-                physics: {
-                    enabled: false,
-                }
+              
             };
 
             // create a network
-            var container = document.getElementById('network');
+            var container = document.getElementById(id);
             var network = new vis.Network(container, data, options);
-        });
-    });
-});
-
+     
+}
 
 
 function escapeSpaces(x) {

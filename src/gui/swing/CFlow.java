@@ -6,6 +6,7 @@ package gui.swing;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
 
 
 public class CFlow {
@@ -54,7 +55,11 @@ public class CFlow {
 
         startButton.addActionListener((ActionEvent actionEvent) -> {
 
-            utils.Utils.generateParsedCode(srcField.getText(),srcOut.getText());
+            try {
+                utils.Utils.generateParsedCode(srcField.getText(),srcOut.getText());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
         });
 
