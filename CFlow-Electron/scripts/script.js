@@ -14,9 +14,12 @@ $(function() {
         $("#quickTest_Submit").click(function(e){
             var regex = $("#tab1 .regex").val();
             main.updateRegex(regex);
+            main.updateIdentifiersLara('cflow/tmp_files/out');
 
-            main.fs.writeFileSync('cflow/tmp_files/code.java', editor.getValue());
-            main.runCFlow('cflow/tmp_files/code.java','cflow/tmp_files/out');
+            var filename = /.* class ([\w]*)/.exec(editor.getValue())[1] + ".java";
+            
+            main.fs.writeFileSync('cflow/tmp_files/' + filename, editor.getValue());
+            main.runCFlow('cflow/tmp_files/' + filename, 'cflow/tmp_files/out');
         });
 
 
@@ -33,9 +36,12 @@ $(function() {
         $("#tab2 .SubmitButton").click(() => {
             var regex = $("#tab2 .regex").val();
             main.updateRegex(regex);
+         
 
             var input = escapeSpaces($("#fromPath").html());
             output = escapeSpaces($("#toPath").html());
+            main.updateIdentifiersLara(output);
+               
             main.runCFlow(input, output, 'p1.pt');
         });
     });

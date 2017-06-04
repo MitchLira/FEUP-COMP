@@ -14,7 +14,7 @@ public class NFASet implements Convertable {
 	public NFASet(SimpleNode root, String operator) {
 		this.root = root;
 		this.operator = operator;
-		sets = new ArrayList<Convertable>();
+		sets = new ArrayList<>();
 		
 		for (int i = 0; i < root.jjtGetNumChildren(); i++) {
 			SimpleNode node = (SimpleNode) root.jjtGetChild(i);

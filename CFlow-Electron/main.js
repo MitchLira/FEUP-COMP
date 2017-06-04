@@ -56,6 +56,20 @@ end`;
     fs.writeFile('cflow/lara/cflow.lara', lara);
 }
 
+exports.updateIdentifiersLara = function(output) {
+    var lara = 
+`aspectdef PragmaPrinter
+   var file = new java.io.File("${output + "/identifiers.txt"}");
+   select pragma{"BasicBlock"} end
+    apply
+        IoUtils.append(file, $pragma.content + "\\n");
+    end
+end`;
+    
+    
+    fs.writeFile('cflow/lara/identifiers.lara', lara);
+}
+
 
 
 exports.runCFlow = function(input, output, command) {

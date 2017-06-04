@@ -3,18 +3,14 @@ package utils;
 import fa.DFA;
 import fa.NFA;
 import logic.NFASet;
-import org.apache.commons.io.IOUtils;
 import parser.GrammarParser;
 import parser.SimpleNode;
-import gui.GraphViz;
 import weaver.gui.KadabraLauncher;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.HashSet;
 
 public class Utils {
 
@@ -33,9 +29,22 @@ public class Utils {
             GrammarParser gp = new GrammarParser(System.in);
             SimpleNode root = gp.Start();
 
+            //Get all the identifiers
+            HashSet<String> identifiers = new HashSet<>();
+            try (BufferedReader br = new BufferedReader(new FileReader("../identifiers.txt"))) {
+                String sCurrentLine;
+
+                while ((sCurrentLine = br.readLine()) != null)
+                    identifiers.add(sCurrentLine);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             NFASet parser = new NFASet((SimpleNode) root.jjtGetChild(0), null);
             NFA nfa = parser.convert();
             nfa.getLastState().setAcceptState(true);
+            nfa.setIdentifiers(identifiers);
             nfa.handleDots();
             nfa.optimize();
             System.out.println(nfa.toString());
@@ -46,9 +55,6 @@ public class Utils {
             writeToFile("nfa",nfa.toDotFormat());
             writeToFile("dfa",dfa.toDotFormat());
 
-           /* createDotGraph(nfa.toDotFormat(), "Nfa");
-            createDotGraph(dfa.toDotFormat(), "Dfa");
-*/
 
             parser.dump();
 
@@ -91,15 +97,24 @@ public class Utils {
         File dst = new File(dstPath + File.separator + src.getName());
         Files.copy(src.toPath(), dst.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-
+        //get the identifiers
         String[] args = new String[5];
+        args[0] = "cflow/lara/identifiers.lara";
+        args[1] = "-p";
+        args[2] = srcPath ;
+        args[3] = "-o";
+        args[4] = dstPath + "/cflowCode";
+        KadabraLauncher.main(args);
+
+        //generate the new code
+        args = new String[5];
         args[0] = "cflow/lara/cflow.lara";
         args[1] = "-p";
         args[2] = srcPath ;
         args[3] = "-o";
         args[4] = dstPath + "/cflowCode";
-
         KadabraLauncher.main(args);
+
     }
 
     //get the range based on regex operator
@@ -135,18 +150,6 @@ public class Utils {
         return  new Pair(lower,upper);
     }
 
-    public static void createDotGraph(String dotFormat,String fileName)
-    {
-        GraphViz gv=new GraphViz();
-        gv.addln(gv.start_graph());
-        gv.add(dotFormat);
-        gv.addln(gv.end_graph());
-        String type = "pdf";
-        gv.decreaseDpi();
-        gv.decreaseDpi();
 
-        File out = new File(fileName + "." + type);
-        gv.writeGraphToFile( gv.getGraph( gv.getDotSource(), type ), out);
-    }
 
 }

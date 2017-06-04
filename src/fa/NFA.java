@@ -16,10 +16,10 @@ public class NFA extends FA {
 
 
 
-    public NFA(Convertable convertable) {
+    public NFA(Convertable convertable ) {
         super();
         this.convertable = convertable;
-        
+
         startState = new NfaState();
         addState(startState);
         currentState = startState;
