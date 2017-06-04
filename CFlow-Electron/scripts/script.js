@@ -1,35 +1,42 @@
 const remote = require('electron').remote;
 const main = remote.require('./main.js');
-var output;
 
+var availableTerms = [];
 
 $(function() {
-   
-
     $("#tab1").load("quickTesting.html", function() {
         var editor = ace.edit("editor");
         editor.setTheme("ace/theme/tomorrow");
         editor.getSession().setMode("ace/mode/java");	
+
+        var srcFilePath = main.rootdirname + '/cflow/tmp_files/main';
+        var dstFilePath = main.rootdirname + '/cflow/tmp_files/out';
+        var classname, filename;
         
         $("#quickTest_Submit").click(function(e){
             var regex = $("#tab1 .regex").val();
             main.updateRegex(regex);
-            main.updateIdentifiersLara('cflow/tmp_files/out');
-
-            var classname = /.* class ([\w]*)/.exec(editor.getValue())[1];
-            var filename =  classname + ".java";
-            var srcFilePath = main.rootdirname + '/cflow/tmp_files/main';
-            var dstFilePath = main.rootdirname + '/cflow/tmp_files/out';
-
-            main.fs.writeFileSync(srcFilePath + '/' + filename, editor.getValue());
-            main.runCFlow(srcFilePath, dstFilePath, classname);
+            main.runCode(dstFilePath, classname);
         });
 
+        $("#tab1 .confirm").click(() => {
+            handleSuggestions();
 
+            main.fs.emptyDirSync(srcFilePath);
+            main.fs.emptyDirSync(dstFilePath);
 
+            classname = /.* class ([\w]*)/.exec(editor.getValue())[1];
+            filename =  classname + ".java";
+
+            main.fs.writeFileSync(srcFilePath + '/' + filename, editor.getValue());
+            prepareCFlow(srcFilePath, dstFilePath);
+        });
     });
 
     $("#tab2").load("projectTesting.html", function() {
+        var input, output;
+
+
         $(".uploadFolder").click(function(e) {
             var path = main.uploadFolder();
             $(this).next(".folderPath").html(path);
@@ -39,13 +46,14 @@ $(function() {
         $("#tab2 .SubmitButton").click(() => {
             var regex = $("#tab2 .regex").val();
             main.updateRegex(regex);
-         
+            main.runCode(output, 'p1.pt');
+        });
 
-            var input = escapeSpaces($("#fromPath").html());
+        $("#tab2 .confirm").click(() => {
+            input = escapeSpaces($("#fromPath").html());
             output = escapeSpaces($("#toPath").html());
             main.updateIdentifiersLara(output);
-               
-            main.runCFlow(input, output, 'p1.pt');
+            main.generateCode(output);
         });
     });
 
@@ -65,6 +73,51 @@ $(function() {
 
     });
 });
+
+
+
+function handleSuggestions() {
+    var suggestions = [];
+
+    $("input.regex").focusin(() => {
+        if ($("input.regex").val().length == 0)
+            $('#tab1 .hintTooltip').html('Available terms:<br> &emsp;' + availableTerms.join(", "));
+        else
+            if (suggestions.length > 0)
+                $('#tab1 .hintTooltip').html('Suggestions:<br> &emsp;' + suggestions.join(", "));
+            else
+                $('#tab1 .hintTooltip').html('No suggestions');
+        
+        $(this).unbind('focusin');
+    });
+
+    $("input.regex").bind("keyup", function(e) {
+        var currentpos = $(this).caret();
+        var text = $(this).val();
+
+        if (text.charAt(currentpos-1).match(/[\w]/)) {
+            for (var i = currentpos; i >= 0; i--) {
+                if (text.charAt(i).match(/[A-Z]/))
+                    break; 
+            }
+            
+            let currentPattern = text.substr(i, currentpos + 1);
+            let regex = new RegExp('^' + currentPattern + '.*');
+            suggestions = [];
+            for (term of availableTerms) {
+                if (term.match(regex))
+                    suggestions.push(term);
+            }
+            
+            if (suggestions.length > 0)
+                $('#tab1 .hintTooltip').html('Suggestions:<br> &emsp;' + suggestions.join(", "));
+            else
+                $('#tab1 .hintTooltip').html('No suggestions');
+        } else {
+            $('#tab1 .hintTooltip').html('Available terms:<br> &emsp;' + availableTerms.join(", "));
+        }
+    });
+}
 
 
 function createGraph(id,dotString){
@@ -96,4 +149,23 @@ function escapeSpaces(x) {
     }
     x = words.join(" ");
     return x;
+}
+
+
+
+function prepareCFlow(src, dst) {
+    main.updateIdentifiersLara(dst);
+    main.generateCode(src, dst);
+
+    availableTerms = main.fs.readFileSync(dst + '/identifiers.txt').toString().split("\n");
+    availableTerms = uniq(availableTerms);
+    availableTerms.pop();
+}
+
+
+function uniq(a) {
+    var seen = {};
+    return a.filter(function(item) {
+        return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+    });
 }

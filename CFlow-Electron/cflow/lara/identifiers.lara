@@ -1,5 +1,5 @@
 aspectdef PragmaPrinter
-   var file = new java.io.File("cflow/tmp_files/out/identifiers.txt");
+   var file = new java.io.File("/home/jbarbosa/joaobarbosa/Github/FEUP-COMP/CFlow-Electron/cflow/tmp_files/out/identifiers.txt");
    select pragma{"BasicBlock"} end
     apply
         IoUtils.append(file, $pragma.content + "\n");
