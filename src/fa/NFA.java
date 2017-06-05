@@ -43,7 +43,7 @@ public class NFA extends FA {
             for (int i = 0; i < upper; i++) {
                 NfaState state = new NfaState();
                 this.addState(state);
-                startState.addEdge(term.getName(), state);
+                lastState.addEdge(term.getName(), state);
                 lastState = state;
             }  
         } else if (lower != null && upper != null) {
