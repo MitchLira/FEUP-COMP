@@ -1,0 +1,3 @@
+A nossa suite de testes deixou de existir numa fase final de desenvolvimento, uma vez que estes são agora 
+efectuados pela interface gráfica que executa os scripts necessários para correr o projeto de forma intuitiva
+e amigável, contendo um jar com todos os métodos necessários para realizar a lógica do programa. 
