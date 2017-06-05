@@ -296,12 +296,18 @@ public class NFA extends FA {
     public String toDotFormat(){
         String res = "";
 
+        res+= startState.getId() + "[style=filled fillcolor=orange]";
+
+        for(Map.Entry<Integer, State> entry : states.entrySet()) {
+            NfaState state = (NfaState) entry.getValue();
+
+            if(state.isAcceptState())
+                res += state.getId() + "[style=filled fillcolor=green]";
+        }
+
         for(Map.Entry<Integer, State> entry : states.entrySet()) {
             NfaState state = (NfaState) entry.getValue();
             Integer stateId =  entry.getKey();
-
-            if(state.isAcceptState())
-                res += state.getId() + "[style=filled]";
 
 
             for(Map.Entry<String, ArrayList<Integer>> entry1 : state.getOut_edges().entrySet())

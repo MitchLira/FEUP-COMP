@@ -101,8 +101,10 @@ $(function() {
                 $(".acception").html("");
                 $(".acception").append(alert);
 
+                $("#parserTree").html("");
+                $("#parserTree").append(statistics.tree);
+               
                 $("#parserStatistics").html("");
-                $("#parserStatistics").append(statistics.tree);
                 $("#parserStatistics").append(statistics.description);
             }
 
@@ -180,9 +182,7 @@ function createGraph(id,dotString){
                 edges: parsedData.edges
             }
 
-            var options = {
-              
-            };
+            var options = parsedData.options;
 
             // create a network
             var container = document.getElementById(id);

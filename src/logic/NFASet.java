@@ -43,6 +43,6 @@ public class NFASet implements Convertable {
 	}
 	
 	public String dump() {
-		return root.toString();
+		return root.dump("");
 	}
 }

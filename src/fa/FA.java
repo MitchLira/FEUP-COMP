@@ -22,7 +22,7 @@ public abstract class FA {
     }
 
     public void setIdentifiers(HashSet<String> identifiers) {
-        this.identifiers = identifiers;
+        this.identifiers.addAll(identifiers);
     }
 
     public void addState(State state) {

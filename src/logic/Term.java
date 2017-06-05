@@ -1,7 +1,6 @@
 package logic;
 
 import fa.NFA;
-import parser.GrammarParserTreeConstants;
 import parser.SimpleNode;
 import utils.Pair;
 import utils.Utils;

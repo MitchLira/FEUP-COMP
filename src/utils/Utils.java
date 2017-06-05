@@ -52,15 +52,13 @@ public class Utils {
             nfa.optimize();
             System.out.println(nfa.toString());
 
-
             dfa = nfa.getDFA();
 
             writeToFile("nfa",nfa.toDotFormat());
             writeToFile("dfa",dfa.toDotFormat());
 
 
-
-            tree =  parser.dump();;
+            tree =  parser.dump();
 
         } catch (Throwable e) {
             System.out.println("Invalid REGEX!\n"+ e.getMessage());
