@@ -79,6 +79,24 @@ exports.generateCode = function(input, output) {
 }
 
 
+exports.runCFlow = function(input, output, command) {
+    const sh = spawn('bash', ['cflow/bash/generateCode.sh', input, output]);
+
+    sh.stdout.on('data', (data) => {
+        console.log(`stdout: ${data}`);
+    });
+
+    sh.stderr.on('data', (data) => {
+        console.log(`stderr: ${data}`);
+    });
+
+    sh.on('close', (code) => {
+        console.log(`child process exited with code ${code}`);
+        exports.runCode(output, command);
+    });
+
+}
+
 exports.runCode = function(path, command) {
     const sh = spawn('bash', ['cflow/bash/runCFlow.sh', path, command]);
 
@@ -96,22 +114,7 @@ exports.runCode = function(path, command) {
 }
 
 
-exports.runCFlow = function(input, output, command) {
-    const sh = spawn('bash', ['cflow/bash/generateCode.sh', input, output]);
 
-    sh.stdout.on('data', (data) => {
-        console.log(`stdout: ${data}`);
-    });
-
-    sh.stderr.on('data', (data) => {
-        console.log(`stderr: ${data}`);
-    });
-
-    sh.on('close', (code) => {
-        console.log(`child process exited with code ${code}`);
-        exports.runCode(output, command);
-    });
-}
 
 
 exports.rmDir = function(dirPath) {

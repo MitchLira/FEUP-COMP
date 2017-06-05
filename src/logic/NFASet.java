@@ -42,7 +42,7 @@ public class NFASet implements Convertable {
 		return sets;
 	}
 	
-	public void dump() {
-		root.dump("");
+	public String dump() {
+		return root.toString();
 	}
 }

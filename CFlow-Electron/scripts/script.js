@@ -6,39 +6,44 @@ var availableTerms = [];
 
 $(function() {
     $("#tab1").load("quickTesting.html", function() {
+        $('.executionDiv').attr("style","display:none;");
+
         var editor = ace.edit("editor");
         editor.setTheme("ace/theme/tomorrow");
         editor.getSession().setMode("ace/mode/java");	
 
-        var srcFilePath = main.rootdirname + '/cflow/tmp_files/main';
-        var dstFilePath = main.rootdirname + '/cflow/tmp_files/out';
+        input = main.rootdirname + '/cflow/tmp_files/main';
+        output = main.rootdirname + '/cflow/tmp_files/out';
         var classname, filename;
         
         $("#quickTest_Submit").click(function(e){
             var regex = $("#tab1 .regex").val();
             main.updateRegex(regex);
-            main.runCode(dstFilePath, classname);
+            main.runCFlow(input,output, classname);
         });
 
         $("#tab1 .confirm").click(() => {
             handleSuggestions('#tab1');
 
-            main.fs.emptyDirSync(srcFilePath);
-            main.fs.emptyDirSync(dstFilePath);
+            main.fs.emptyDirSync(input);
+            main.fs.emptyDirSync(output);
 
             classname = /.* class ([\w]*)/.exec(editor.getValue())[1];
             filename =  classname + ".java";
 
-            input = srcFilePath;
-            output = dstFilePath;
+            main.fs.writeFileSync(input + '/' + filename, editor.getValue());
+            prepareCFlow(input, output);
 
-            main.fs.writeFileSync(srcFilePath + '/' + filename, editor.getValue());
-            prepareCFlow(srcFilePath, dstFilePath);
+            $('.executionDiv').attr("style","display:block;");
+
         });
     });
 
+
     $("#tab2").load("projectTesting.html", function() {
 
+        $('.executionDiv').attr("style","display:none;");
+        
         $(".uploadFolder").click(function(e) {
             var path = main.uploadFolder();
             $(this).next(".folderPath").html(path);
@@ -48,7 +53,9 @@ $(function() {
         $("#tab2 .SubmitButton").click(() => {
             var regex = $("#tab2 .regex").val();
             main.updateRegex(regex);
-            main.runCode(output, 'p1.pt');
+            main.runCFlow(input,output, $("input.runConfig").val());
+
+            return false;
         });
 
         $("#tab2 .confirm").click(() => {
@@ -57,19 +64,57 @@ $(function() {
             input = escapeSpaces($("#fromPath").html());
             output = escapeSpaces($("#toPath").html());
 
-            main.fs.unlinkSync(output + '/identifiers.txt');
-            main.updateIdentifiersLara(output);
+
+            var identifiersPath = output + '/identifiers.txt';
+            if(main.fs.existsSync(identifiersPath))
+                main.fs.unlinkSync(identifiersPath);
+    
+            
+            //show loader
+            //$( "<div class='loader'></div>" ).insertAfter( "#projectSettings" );
+            
             prepareCFlow(input, output);
+            $('.executionDiv').attr("style","display:block;");
+
         });
     });
 
+    
+
     $("#tab3").load("results.html", function() {
        $("a[href='#tab3']").click(() => {
-            var nfaDot = main.fs.readFileSync(output + "/bin/nfa");
-            createGraph("nfa",nfaDot);
+            var statisticsPath=output + "/bin/statistics";
+            var nfaPath=output + "/bin/nfa";
+            var dfaPath=output + "/bin/dfa";
+
+
+            if(main.fs.existsSync(statisticsPath)){
+                var statistics =  JSON.parse(main.fs.readFileSync(statisticsPath));
+                console.log(statistics);
+                
+                var alert;
+                if(statistics.result)
+                    alert = "<div class='alert alert-success'> <strong>Regex accepted!</strong> </div>"
+                else
+                    alert = "<div class='alert alert-danger'> <strong>Regex not accepted!</strong> </div>"
+
+                $(".acception").html("");
+                $(".acception").append(alert);
+
+                $("#parserStatistics").html("");
+                $("#parserStatistics").append(statistics.tree);
+                $("#parserStatistics").append(statistics.description);
+            }
+
+            if(main.fs.existsSync(nfaPath)){
+                var nfaDot = main.fs.readFileSync(nfaPath);
+                createGraph("nfa",nfaDot);
+            }
             
-            var dfaDot = main.fs.readFileSync(output + "/bin/dfa");
-            createGraph("dfa",dfaDot);
+            if(main.fs.existsSync(dfaPath)){
+                var dfaDot = main.fs.readFileSync(dfaPath);
+                createGraph("dfa",dfaDot);
+            }
        });
 
      
@@ -93,6 +138,7 @@ function handleSuggestions(selector) {
         
         $(this).unbind('focusin');
     });
+
 
     $("input.regex").bind("keyup", function(e) {
         var currentpos = $(this).caret();
@@ -157,12 +203,14 @@ function escapeSpaces(x) {
 
 
 function prepareCFlow(src, dst) {
+    
     main.updateIdentifiersLara(dst);
     main.generateCode(src, dst);
 
     availableTerms = main.fs.readFileSync(dst + '/identifiers.txt').toString().split("\n");
     availableTerms = uniq(availableTerms);
     availableTerms.pop();
+
 }
 
 

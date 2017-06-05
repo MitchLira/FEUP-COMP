@@ -5,6 +5,11 @@ import java.util.Map;
 
 public class DFA extends FA {
     private boolean onDeathState;
+    private String description="";
+
+    public String getDescription() {
+        return description;
+    }
 
     public void transition(String edgeID) {
 
@@ -18,6 +23,7 @@ public class DFA extends FA {
             onDeathState=true;
         else {
             currentState = states.get(stateId);
+            description += "Transaction from state(" + currentState.getId() + ") with EdgeId: " + edgeID + " to state(" + currentState.getId() + ") \n";
             System.out.println("\tTransaction with EdgeId: " + edgeID + " | New state id: " + currentState.getId() + " aceppting state(" +  currentState.isAcceptState() + ")");
         }
     }

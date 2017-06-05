@@ -3,6 +3,8 @@ package utils;
 import fa.DFA;
 import fa.NFA;
 import logic.NFASet;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import parser.GrammarParser;
 import parser.SimpleNode;
 import weaver.gui.KadabraLauncher;
@@ -15,6 +17,7 @@ import java.util.HashSet;
 public class Utils {
 
     public static DFA dfa;
+    public static String tree;
 
     public static void initDfa(String regex)   {
         System.out.println("-------------Starting cflow execution------------\n");
@@ -56,7 +59,8 @@ public class Utils {
             writeToFile("dfa",dfa.toDotFormat());
 
 
-            parser.dump();
+
+            tree =  parser.dump();;
 
         } catch (Throwable e) {
             System.out.println("Invalid REGEX!\n"+ e.getMessage());
@@ -64,9 +68,6 @@ public class Utils {
             System.exit(1);
         }
 
-
-
-        System.out.println("-------------User Code------------\n");
     }
 
     public static void writeToFile(String fileName,String content){
@@ -82,12 +83,24 @@ public class Utils {
 
 
     public static void dfaStatistics(){
-        System.out.println("-------------Ended cflow execution------------\n");
 
-        if(Utils.dfa.onAcceptState())
-            System.out.println("Regex acepted");
-        else
-            System.out.println("Regex not acepted");
+        try {
+            JSONObject obj = new JSONObject();
+            obj.put("result", Utils.dfa.onAcceptState());
+            obj.put("description",dfa.getDescription());
+            obj.put("tree",tree);
+
+            //save the file
+            writeToFile("statistics",obj.toString());
+
+            if(Utils.dfa.onAcceptState())
+                System.out.println("Regex acepted");
+            else
+                System.out.println("Regex not acepted");
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void generateParsedCode(String srcPath, String dstPath) throws IOException{

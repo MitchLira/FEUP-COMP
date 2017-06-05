@@ -1,5 +1,5 @@
 aspectdef PragmaPrinter
-   var file = new java.io.File("/home/jbarbosa/teste/identifiers.txt");
+   var file = new java.io.File("/home/josemartins/IdeaProjects/FEUP-COMPv2/testsuite/exampleOutput/laraOutput/identifiers.txt");
    select pragma{"BasicBlock"} end
     apply
         IoUtils.append(file, $pragma.content + "\n");
