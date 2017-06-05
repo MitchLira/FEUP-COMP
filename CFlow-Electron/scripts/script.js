@@ -209,26 +209,28 @@ function generateCode(tab, input, output) {
     $("#tab" + tab + " .confirm").attr("style","display:none;");
 
     sh.stdout.on('data', (data) => {
-        console.log(`stdout: ${data}`);
     });
 
     sh.stderr.on('data', (data) => {
-        console.log(`stderr: ${data}`);
     });
 
     sh.on('close', (code) => {
-        console.log(`child process exited with code ${code}`);
-    
-        var identifiersPath = output + '/identifiers.txt';
-        if (main.fs.existsSync(identifiersPath)) {
-            availableTerms = main.fs.readFileSync(identifiersPath).toString().split("\n");
-            availableTerms = uniq(availableTerms);
-            availableTerms.pop();
-        }
+     if(code != 0){
+            alert("An erro has occured");
+            $("#tab" + tab + " .confirm").attr("style","display:block;");
+            $('.loader').remove();
+        }else{
+            var identifiersPath = output + '/identifiers.txt';
+            if (main.fs.existsSync(identifiersPath)) {
+                availableTerms = main.fs.readFileSync(identifiersPath).toString().split("\n");
+                availableTerms = uniq(availableTerms);
+                availableTerms.pop();
+            }
 
-        $('.loader').remove();
-        $("#tab" + tab + " .confirm").attr("style","display:block;");
-        $('.executionDiv').attr("style","display:block;");
+            $('.loader').remove();
+            $("#tab" + tab + " .confirm").attr("style","display:block;");
+            $('.executionDiv').attr("style","display:block;");
+        }
     });
 }
 
@@ -237,40 +239,42 @@ function generateCode(tab, input, output) {
 function runCFlow(tab,input, output, command) {
     const sh = spawn('bash', ['cflow/bash/generateCode.sh', input, output]);
     $('.executionDiv').attr("style","display:none;");
+    $("#tab" + tab + " .confirm").attr("style","display:none;");
     $("#tab" + tab + " .loaderContainer").html("<div class='loader text-center'></div>" );
 
     sh.stdout.on('data', (data) => {
-        console.log(`stdout: ${data}`);
     });
 
     sh.stderr.on('data', (data) => {
-        console.log(`stderr: ${data}`);
     });
 
     sh.on('close', (code) => {
         console.log(`child process exited with code ${code}`);
         commands = command.split(' ');
-        runCode(output, commands);
+        runCode(tab,output, commands);
     });
-
 }
 
-function runCode(path, commands) {
+function runCode(tab,path, commands) {
     commands = ['cflow/bash/runCFlow.sh', path, ...commands];
     const sh = spawn('bash', commands);
 
     sh.stdout.on('data', (data) => {
-        console.log(`stdout: ${data}`);
     });
 
     sh.stderr.on('data', (data) => {
-        console.log(`stderr: ${data}`);
     });
 
     sh.on('close', (code) => {
-        console.log(`child process exited with code ${code}`);
-        $('.loader').remove();
-        $("a[href='#tab3']").click();
+        if(code != 0){
+            alert("An error has occured")
+            $("#tab" + tab + " .confirm").attr("style","display:block;");
+            $('.loader').remove();
+        }else{
+            $("#tab" + tab + " .confirm").attr("style","display:block;");
+            $('.loader').remove();
+            $("a[href='#tab3']").click();
+        }
     });
 }
 

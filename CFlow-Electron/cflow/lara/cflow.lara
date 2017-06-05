@@ -7,7 +7,7 @@ aspectdef CFlow
 
     select method{"main"}.first_stmt end
         apply
-            $first_stmt.insert before %{utils.Utils.initDfa("");}%;
+            $first_stmt.insert before %{utils.Utils.initDfa("DSASFDA");}%;
         end
 
 
