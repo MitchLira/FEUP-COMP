@@ -1,0 +1,10 @@
+Este exemplo pretende explicar o 'Quick Testing':
+
+- Insira o código que pretende testar (em Java Code)
+- Insira a regex pretendida (em Regex)
+- Corra!
+
+
+Exemplo:
+	Código: copiar o conteúdo do ficheiro em QuickTesting.java
+	Regex: A

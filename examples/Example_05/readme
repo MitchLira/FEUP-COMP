@@ -1,0 +1,6 @@
+Neste exemplo pretendemos demonstrar a dinâmica no parsing da Regex e na geração dos autómatos.
+
+O NFA é gerado tendo em conta a Regex fornecida pelo utilizador, usando a Regex Tree (ver 'regex_tree.png'). Nesta fase, a geração precisa somente desta árvore, criando o NFA que aceita a regex (como mostra a imagem 'nfa.png').
+
+No entanto, na criação do DFA, além de tomar em conta a regex fornecida (cujos valores vêm diretamente do NFA), tem também em conta os possíveis valores no código em si. No ficheiro 'Statistics.java', existem os seguintes BasicBlocks: A, B, C e D.
+Assim, o DFA considera estes valores, gerando o autómato no ficheiro 'dfa.png'. Desta forma, ao passar em valores inválidos na Regex, o DFA consegue ir para o estado de rejeição (estado morto), rejeitando a regex fornecida sem problemas.

@@ -1,0 +1,14 @@
+Project Testing.
+
+Descrição: Exemplo de um código simples em Java, com um só ficheiro. Mostra os elementos básicos do CFlow.
+
+Configurações:
+	Source Folder: <path>/examples/Example_01
+	Destination Folder: <path>/examples/Output
+	Run Configuration: HelloWorld
+
+O programa deve aceitar:
+	- HelloAssignLoop*Final
+	- HelloAssignLoop{10}Final
+	- .*Loop{10}Final
+	- ...

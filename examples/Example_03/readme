@@ -1,0 +1,13 @@
+Project Testing.
+
+Descrição: O CFlow também permite que os programas tenham argumentos, como se pode verificar neste exemplo.
+
+Configurações:
+	Source Folder: <path>/examples/Example_03 
+	Destination Folder: <path>/examples/Output
+	Run Configuration: InputArgs <string>
+
+O programa deve aceitar:
+	- A C{2} B1			(para palíndromos de 4 ou 5 caracteres)
+	- .* B1? B2?			(qualquer input)
+	- ...
