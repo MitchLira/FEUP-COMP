@@ -7,7 +7,7 @@
 // Write your code here!
 public class HelloWorld {
     public static void main(String[] args) {
-        utils.Utils.initDfa("T");
+        utils.Utils.initDfa("");
         // @BasicBlock A
         utils.Utils.dfa.transition("A");
         // @BasicBlock Abc

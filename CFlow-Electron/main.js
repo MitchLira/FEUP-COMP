@@ -6,6 +6,7 @@ const spawnSync = require('child_process').spawnSync;
 const fs = require('fs-extra');
 
 
+
 app.on('ready', () => {
     const {width, height} = electron.screen.getPrimaryDisplay().workAreaSize;
     let window = new BrowserWindow({width, height});
@@ -72,50 +73,6 @@ end`;
     
     fs.writeFile('cflow/lara/identifiers.lara', lara);
 }
-
-
-exports.generateCode = function(input, output) {
-    return spawnSync('bash', ['cflow/bash/generateCode.sh', input, output]);
-}
-
-
-exports.runCFlow = function(input, output, command) {
-    const sh = spawn('bash', ['cflow/bash/generateCode.sh', input, output]);
-
-    sh.stdout.on('data', (data) => {
-        console.log(`stdout: ${data}`);
-    });
-
-    sh.stderr.on('data', (data) => {
-        console.log(`stderr: ${data}`);
-    });
-
-    sh.on('close', (code) => {
-        console.log(`child process exited with code ${code}`);
-        commands = command.split(' ');
-        exports.runCode(output, commands);
-    });
-
-}
-
-exports.runCode = function(path, commands) {
-    commands = ['cflow/bash/runCFlow.sh', path, ...commands];
-    const sh = spawn('bash', commands);
-
-    sh.stdout.on('data', (data) => {
-        console.log(`stdout: ${data}`);
-    });
-
-    sh.stderr.on('data', (data) => {
-        console.log(`stderr: ${data}`);
-    });
-
-    sh.on('close', (code) => {
-        console.log(`child process exited with code ${code}`);
-    });
-}
-
-
 
 
 

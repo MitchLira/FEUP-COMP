@@ -12,6 +12,7 @@
   "dependencies": {
     "child_process": "^1.0.2",
     "electron-prebuilt": "^1.4.13",
-    "fs-extra": "^3.0.1"
+    "fs-extra": "^3.0.1",
+    "jquery": "^3.2.1"
   }
 }
