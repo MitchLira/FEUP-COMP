@@ -1,6 +1,7 @@
 const remote = require('electron').remote;
 const main = remote.require('./main.js');
 
+var input, output;
 var availableTerms = [];
 
 $(function() {
@@ -20,7 +21,7 @@ $(function() {
         });
 
         $("#tab1 .confirm").click(() => {
-            handleSuggestions();
+            handleSuggestions('#tab1');
 
             main.fs.emptyDirSync(srcFilePath);
             main.fs.emptyDirSync(dstFilePath);
@@ -28,14 +29,15 @@ $(function() {
             classname = /.* class ([\w]*)/.exec(editor.getValue())[1];
             filename =  classname + ".java";
 
+            input = srcFilePath;
+            output = dstFilePath;
+
             main.fs.writeFileSync(srcFilePath + '/' + filename, editor.getValue());
             prepareCFlow(srcFilePath, dstFilePath);
         });
     });
 
     $("#tab2").load("projectTesting.html", function() {
-        var input, output;
-
 
         $(".uploadFolder").click(function(e) {
             var path = main.uploadFolder();
@@ -50,23 +52,24 @@ $(function() {
         });
 
         $("#tab2 .confirm").click(() => {
+            handleSuggestions('#tab2');
+
             input = escapeSpaces($("#fromPath").html());
             output = escapeSpaces($("#toPath").html());
+
+            main.fs.unlinkSync(output + '/identifiers.txt');
             main.updateIdentifiersLara(output);
-            main.generateCode(output);
+            prepareCFlow(input, output);
         });
     });
 
     $("#tab3").load("results.html", function() {
        $("a[href='#tab3']").click(() => {
-
             var nfaDot = main.fs.readFileSync(output + "/bin/nfa");
-              console.log("nfa->" + nfaDot );
             createGraph("nfa",nfaDot);
             
             var dfaDot = main.fs.readFileSync(output + "/bin/dfa");
             createGraph("dfa",dfaDot);
-
        });
 
      
@@ -76,17 +79,17 @@ $(function() {
 
 
 
-function handleSuggestions() {
+function handleSuggestions(selector) {
     var suggestions = [];
 
     $("input.regex").focusin(() => {
         if ($("input.regex").val().length == 0)
-            $('#tab1 .hintTooltip').html('Available terms:<br> &emsp;' + availableTerms.join(", "));
+            $(selector + ' .hintTooltip').html('Available terms:<br> &emsp;' + availableTerms.join(", "));
         else
             if (suggestions.length > 0)
-                $('#tab1 .hintTooltip').html('Suggestions:<br> &emsp;' + suggestions.join(", "));
+                $(selector + ' .hintTooltip').html('Suggestions:<br> &emsp;' + suggestions.join(", "));
             else
-                $('#tab1 .hintTooltip').html('No suggestions');
+                $(selector + ' .hintTooltip').html('No suggestions');
         
         $(this).unbind('focusin');
     });
@@ -110,11 +113,11 @@ function handleSuggestions() {
             }
             
             if (suggestions.length > 0)
-                $('#tab1 .hintTooltip').html('Suggestions:<br> &emsp;' + suggestions.join(", "));
+                $(selector + ' .hintTooltip').html('Suggestions:<br> &emsp;' + suggestions.join(", "));
             else
-                $('#tab1 .hintTooltip').html('No suggestions');
+                $(selector + ' .hintTooltip').html('No suggestions');
         } else {
-            $('#tab1 .hintTooltip').html('Available terms:<br> &emsp;' + availableTerms.join(", "));
+            $(selector + ' .hintTooltip').html('Available terms:<br> &emsp;' + availableTerms.join(", "));
         }
     });
 }
