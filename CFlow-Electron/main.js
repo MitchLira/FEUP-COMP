@@ -92,13 +92,15 @@ exports.runCFlow = function(input, output, command) {
 
     sh.on('close', (code) => {
         console.log(`child process exited with code ${code}`);
-        exports.runCode(output, command);
+        commands = command.split(' ');
+        exports.runCode(output, commands);
     });
 
 }
 
-exports.runCode = function(path, command) {
-    const sh = spawn('bash', ['cflow/bash/runCFlow.sh', path, command]);
+exports.runCode = function(path, commands) {
+    commands = ['cflow/bash/runCFlow.sh', path, ...commands];
+    const sh = spawn('bash', commands);
 
     sh.stdout.on('data', (data) => {
         console.log(`stdout: ${data}`);

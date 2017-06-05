@@ -19,7 +19,7 @@ $(function() {
         $("#quickTest_Submit").click(function(e){
             var regex = $("#tab1 .regex").val();
             main.updateRegex(regex);
-            main.runCFlow(input,output, classname);
+            main.runCFlow(input, output, classname);
         });
 
         $("#tab1 .confirm").click(() => {
@@ -53,7 +53,7 @@ $(function() {
         $("#tab2 .SubmitButton").click(() => {
             var regex = $("#tab2 .regex").val();
             main.updateRegex(regex);
-            main.runCFlow(input,output, $("input.runConfig").val());
+            main.runCFlow(input, output, $("input.runConfig").val());
 
             return false;
         });
@@ -207,10 +207,12 @@ function prepareCFlow(src, dst) {
     main.updateIdentifiersLara(dst);
     main.generateCode(src, dst);
 
-    availableTerms = main.fs.readFileSync(dst + '/identifiers.txt').toString().split("\n");
-    availableTerms = uniq(availableTerms);
-    availableTerms.pop();
-
+    var identifiersPath = dst + '/identifiers.txt';
+    if (main.fs.existsSync(identifiersPath)) {
+        availableTerms = main.fs.readFileSync(identifiersPath).toString().split("\n");
+        availableTerms = uniq(availableTerms);
+        availableTerms.pop();
+    }
 }
 
 
